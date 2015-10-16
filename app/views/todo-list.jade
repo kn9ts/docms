@@ -1,0 +1,18 @@
+input.toggle-all(type='checkbox')
+label(for='toggle-all') Mark all as complete
+ul.todo-list
+  // These are here just to show the structure of the list items
+  // List items should get the class `editing` when editing
+  // and `completed` when marked as completed
+  li.completed
+    .view
+      input.toggle(type='checkbox', checked='')
+      label Taste JavaScript
+      button.destroy
+    input.edit(value='Create a TodoMVC template')
+  li
+    .view
+      input.toggle(type='checkbox')
+      label Buy a unicorn
+      button.destroy
+    input.edit(value='Rule the web')
