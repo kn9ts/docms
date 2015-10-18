@@ -1,4 +1,4 @@
-var mongoose = require('../config/db-connect'),
+var mongoose = require('../config/database'),
   Schema = mongoose.Schema;
 
 // Mongoose assigns each of your schemas an id virtual getter by default which returns the
