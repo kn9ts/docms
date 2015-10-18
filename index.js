@@ -1,14 +1,17 @@
 var express = require('express'),
   path = require('path'),
   env = process.env.NODE_ENV || 'development',
-  config = require('./server/config')[env],
+  config = require('./server/config').getEnvironment(env),
   // favicon = require('serve-favicon'),
   logger = require('morgan'),
   cookieParser = require('cookie-parser'),
   bodyParser = require('body-parser'),
   session = require('express-session'),
   routes = require('./server/routes'),
-  app = express();
+  app = express(),
+  vantage = require('vantage')(),
+  request = require('superagent'),
+  colors = require('colors');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'server/views'));
@@ -16,7 +19,7 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+// app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false
@@ -27,7 +30,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, './public')));
 app.use(session({
   secret: config.expressSessionKey,
-  // store: sessionStore, // connect-mongo session store
   proxy: true,
   resave: true,
   saveUninitialized: true
@@ -69,7 +71,9 @@ app.use(function(err, req, res, next) {
 });
 
 var server = app.listen(process.env.PORT || 3000, function() {
-  console.log('Express server listening on %d, in %s mode \n', server.address().port, app.get('env'));
+  // console.log('Express server listening on %d, in %s mode \n', server.address().port, app.get('env'));
+  var initVantage = require('./cli-app');
+  initVantage(app, vantage, colors, request);
 });
 
 module.exports = app;
