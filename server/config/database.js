@@ -1,10 +1,10 @@
 var Mongoose = require('mongoose');
-Mongoose.createConnection('localhost', 'dmc');
+Mongoose.connect("localhost:27017/dmc");
 
 // CONNECTION EVENTS
 // When successfully connected
 Mongoose.connection.on('connected', function() {
-  console.log('Mongoose has connected to the database specified');
+  // console.log('Mongoose has connected to the database specified.');
 });
 
 // If the connection throws an error
