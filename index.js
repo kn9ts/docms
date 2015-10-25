@@ -7,6 +7,8 @@ var express = require('express'),
   cookieParser = require('cookie-parser'),
   bodyParser = require('body-parser'),
   session = require('express-session'),
+  MongoStore = require('connect-mongo')(session),
+  Mongoose = require('./server/config/database'),
   routes = require('./server/routes'),
   app = express(),
   vantage = require('vantage')(),
@@ -19,6 +21,8 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+
+// uncomment if you want to debug/log
 // app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -32,11 +36,28 @@ app.use(session({
   secret: config.expressSessionKey,
   proxy: true,
   resave: true,
-  saveUninitialized: true
+  saveUninitialized: true,
+  store: new MongoStore({
+    mongooseConnection: Mongoose.connection
+  })
 }));
 
-// app.use('/', routes);
-routes(app, config);
+// CORS Support in my Node.js web app written with Express
+// http://stackoverflow.com/questions/7067966/how-to-allow-cors-in-express-nodejs
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD');
+  next();
+});
+
+// handle OPTIONS requests from the browser
+app.options("*", function(req, res, next) {
+  res.send(200);
+});
+
+var apiRouter = express.Router();
+app.use('/api', routes(apiRouter, config));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -71,8 +92,8 @@ app.use(function(err, req, res, next) {
 });
 
 var server = app.listen(process.env.PORT || 3000, function() {
-  // console.log('Express server listening on %d, in %s mode \n', server.address().port, app.get('env'));
-  var initVantage = require('./cli-app');
+  // console.log('Express server listening on %d, in %s mode \n', 3000, app.get('env'));
+  var initVantage = require('./cli');
   initVantage(app, vantage, colors, request);
 });
 
