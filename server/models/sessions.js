@@ -3,12 +3,14 @@ var mongoose = require('../config/database'),
 
 module.exports = mongoose.model('dmcSession', new Schema({
   // _id: new Schema.Types.ObjectId, // created by Mongodb
-  userId: String,
-  username: String,
-  password: String,
+  sessionForId: String,
   sessionActive: {
     type: Boolean,
     default: true
+  },
+  isDocument: {
+    type: Boolean,
+    default: false
   },
   createdAt: {
     type: Date,

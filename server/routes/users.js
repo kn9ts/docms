@@ -1,4 +1,4 @@
-var Users = require('../schemas/users'),
+var Users = require('../models/users'),
   SessionService = require('../services/sessions'),
   bcrypt = require('bcrypt');
 
@@ -27,24 +27,26 @@ module.exports = function(api, config) {
               // is the password validly equal to its encrypted version
               if (areMatching) {
                 // set username session to used when user has logged in
-                // req.session.username = req.body.username;
-                // req.session.password = user.password;
-                // req.session.LOGGEDIN = true;
-                SessionService.set(user).then(function(response) {
-                  var err = response[0];
-                  if (!err) {
-                    var userSession = response[1];
-                    // send back a response
-                    res.status(200).json({
-                      status: 200,
-                      message: 'Successfully logged in.'
-                    });
-                  } else {
-                    res.status(404).json({
-                      status: 404,
-                      message: 'Server error: ' + err.message
-                    });
+                SessionService.clear(function(err) {
+                  if (err) {
+                    throw err;
                   }
+                  SessionService.set(user).then(function(response) {
+                    var err = response[0];
+                    if (!err) {
+                      var userSession = response[1];
+                      // send back a response
+                      res.status(200).json({
+                        status: 200,
+                        message: 'Successfully logged in.'
+                      });
+                    } else {
+                      res.status(404).json({
+                        status: 404,
+                        message: 'Server error: ' + err.message
+                      });
+                    }
+                  });
                 });
               } else {
                 res.status(416).json({

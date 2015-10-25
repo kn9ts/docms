@@ -1,4 +1,4 @@
-var Role = require('../schemas/roles');
+var Role = require('../models/roles');
 
 module.exports = function(api, config) {
   api.route('/roles')

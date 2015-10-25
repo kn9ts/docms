@@ -1,4 +1,4 @@
-var Documents = require('../schemas/documents');
+var Documents = require('../models/documents');
 
 module.exports = function(api, config) {
   api.route('/documents/search/:term')
