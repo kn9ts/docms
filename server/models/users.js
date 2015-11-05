@@ -10,5 +10,10 @@ module.exports = mongoose.model('Users', new Schema({
     lowercase: true,
     trim: true
   },
+  name: {
+    first: String,
+    last: String
+  },
+  email: String,
   password: String
 }));
