@@ -31,7 +31,10 @@ module.exports = {
         }
         // it was not found
         else {
-          thisModule.clear(function(rawSessionUpdates) {
+          thisModule.clear(function(err) {
+            if (err) {
+              response.reject([err, null]);
+            }
             // Then create a new session
             var newUserSession = new Session();
             newUserSession.sessionForId = user._id;
@@ -66,6 +69,7 @@ module.exports = {
             minutes30past = moment().subtract(30, 'minutes').format(),
             sessionDate = moment(userSession.lastUpdated).format();
 
+          // was the session made before now
           // check if the session is expired (last used more than 30 minutes ago)
           if (moment(sessionDate).isBefore(now) && moment(sessionDate).isAfter(minutes30past)) {
             // update his user session time
@@ -84,7 +88,6 @@ module.exports = {
           }
         }
       });
-
     return response.promise;
   },
 
@@ -110,7 +113,7 @@ module.exports = {
   clear: function(cb) {
     // deactivate all previous sessions
     Session
-      .remove({})
+      .remove({}) // everything
       .remove(function(err) {
         if (typeof cb == 'function') {
           cb(err);
