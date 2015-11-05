@@ -1,4 +1,4 @@
-module.exports = function(app, vantage, colors, request, API) {
+module.exports = function(vantage, apiUrl, request, colors) {
 
   var repl = vantage.find('repl');
   if (repl) {
@@ -16,7 +16,7 @@ module.exports = function(app, vantage, colors, request, API) {
     .action(function(args, callback) {
       var vorpal = this;
       request
-        .get(API)
+        .get(apiUrl)
         .end(function(err, res) {
           if (res.status === 200) {
             vorpal.log(res.body.message);
@@ -30,7 +30,7 @@ module.exports = function(app, vantage, colors, request, API) {
     .action(function(args, callback) {
       var vorpal = this;
       request
-        .get(API + '/status')
+        .get(apiUrl + '/status')
         .end(function(err, res) {
           if (res.status === 200) {
             vorpal.log(colors.green(res.body.message));
@@ -42,11 +42,12 @@ module.exports = function(app, vantage, colors, request, API) {
     });
 
   vantage.command('session')
+    .alias('whoami')
     .description('Checks whether if user is logged in and which one.')
     .action(function(args, callback) {
       var vorpal = this;
       request
-        .get(API + '/whose/session')
+        .get(apiUrl + '/whose/session')
         .end(function(err, res) {
           if (res.status === 200) {
             vorpal.log(colors.green(res.body.message));

@@ -1,16 +1,9 @@
-module.exports = function(app, vantage, colors, request) {
+module.exports = function(app, vantage, request, colors) {
 
   var apiUrl = 'http://localhost:3000/api';
-  require('./status')(app, vantage, colors, request, apiUrl);
-  require('./users')(app, vantage, colors, request, apiUrl);
-  require('./document')(app, vantage, colors, request, apiUrl);
-
-  // Catch incorrect typed in commands
-  vantage
-    .catch('[words...]', 'Catches incorrect commands')
-    .action(function(args, cb) {
-      this.log(args.words.join(' ') + ' is not a valid command.');
-    });
+  require('./utilities')(vantage, apiUrl, request, colors);
+  require('./user')(vantage, apiUrl, request, colors);
+  require('./document')(vantage, apiUrl, request, colors);
 
   // Name your prompt delimiter
   // 'websvr~$', listen on port 80
@@ -18,7 +11,7 @@ module.exports = function(app, vantage, colors, request) {
   vantage
     .delimiter('document-cli~$'.white)
     .listen(app, 3890, function(socket) {
-      // this.log('Accepted a connection.\n');
+      this.log(colors.green('Let\'s sail.\n'));
     })
     .show();
 };
