@@ -1,7 +1,7 @@
+'use strict';
 var Mongoose = require('mongoose');
-Mongoose.connect("localhost:27017/dmc");
+Mongoose.connect(process.env.DATABASE);
 
-// CONNECTION EVENTS
 // When successfully connected
 Mongoose.connection.on('connected', function() {
   // console.log('Mongoose has connected to the database specified.');

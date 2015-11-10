@@ -1,19 +1,39 @@
-var mongoose = require('../config/database'),
-  Schema = mongoose.Schema;
+'use strict';
+module.exports = function(mongoose, Schema) {
 
-// Mongoose assigns each of your schemas an id virtual getter by default which returns the
-// documents _id field cast to a string, or in the case of ObjectIds, its hexString.
-module.exports = mongoose.model('Users', new Schema({
-  // _id: new Schema.Types.ObjectId, // created by Mongodb
-  username: {
-    type: String,
-    lowercase: true,
-    trim: true
-  },
-  name: {
-    first: String,
-    last: String
-  },
-  email: String,
-  password: String
-}));
+  var UserSchema = new Schema({
+    // _id: new Schema.Types.ObjectId, // created by Mongodb
+    username: {
+      type: String,
+      lowercase: true,
+      trim: true
+    },
+    name: {
+      first: String,
+      last: String
+    },
+    email: String,
+    password: String,
+    token: String,
+    docsCreated: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Documents'
+    }],
+    dateCreated: {
+      type: Date,
+      default: Date.now
+    }
+  });
+
+  UserSchema.virtual('name.full')
+    .set(function(name) {
+      var split = name.split(' ');
+      this.name.first = split[0];
+      this.name.last = split[1];
+    })
+    .get(function() {
+      return this.name.first + ' ' + this.name.last;
+    });
+
+  return mongoose.model('Users', UserSchema);
+};

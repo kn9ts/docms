@@ -1,21 +1,57 @@
 module.exports = function(vantage, apiUrl, request, colors) {
-  var Documents = require('../controllers/document')(request, apiUrl);
+  var Documents = require('../controllers/document')(request, vantage, apiUrl);
 
   // Create document
   vantage.command('doc <action> [content...]')
     .alias('docs')
     .alias('documents')
+    .option('-p, --private', 'Make the document private')
     .option('-i, --id <document_id>', 'Select or reference the document by ID about to be altered')
-    // .option('-s, --search <term>', 'Search for a document or documents')
     .description('Do document operations')
     .action(function(args, next) {
-      var vorpal = this;
-      // vorpal.log(args, args.hasOwnProperty('action'));
+      var cli = this;
+      // cli.log(args, args.hasOwnProperty('action'));
       // doc add/create/update/extend/delete/search [content...]
       if (args.hasOwnProperty('action')) {
         var content;
         if (args.content) {
           content = args.content.join(' ');
+          // If add is used replace with create
+          args.action.replace('add', 'create');
+        }
+        cli.log(args);
+
+        // Have the document options been provided
+        if (args.hasOwnProperty('options')) {
+          // If the --private option is missing, set it to false
+          if (!args.options.hasOwnProperty('private')) {
+            args.options.private = false;
+          }
+
+          // If the --id option is missing, set it to false
+          if (!args.options.hasOwnProperty('id')) {
+            args.options.id = false;
+          }
+        } else {
+          // If missing, issue some defaults
+          args.options = {
+            private: false,
+            id: null
+          };
+        }
+
+        if (/(add|create|update|delete)/gi.test(args.action)) {
+          // if no doc ID was provided, use one in session if it exists
+          if (!args.options.id) {
+            if (Documents.current) {
+              args.options.id = Documents.current._id;
+            } else {
+              cli.log(colors.grey('Please select the document or provide the Id of the document to be manage it.'));
+              cli.log(colors.yellow('Use command: select <document_id>'));
+              cli.log(colors.yellow('Or: doc --id <document_id> update/delete [new content here if updating...]'));
+              return next();
+            }
+          }
         }
 
         switch (args.action) {
@@ -23,16 +59,15 @@ module.exports = function(vantage, apiUrl, request, colors) {
           case 'all':
             Documents.all(function(err, res) {
               if (err) {
-                vorpal.log(colors.red('Error: ' + err));
-                next();
+                cli.log(colors.red('Error: ' + err));
+                return next();
               }
-
-              if (res.documents.length > 0) {
+              if (res.documents && res.documents.length > 0) {
                 res.documents.forEach(function(doc) {
-                  vorpal.log('[Id: ' + colors.green(doc._id) + '] ' + doc.content);
+                  cli.log('[id: ' + colors.green(doc._id) + ' creator:' + doc._creator.username.cyan + '] ' + doc.content);
                 });
               } else {
-                vorpal.log(colors.yellow(res.message));
+                cli.log(colors.yellow(res.message));
               }
               next();
             });
@@ -40,14 +75,15 @@ module.exports = function(vantage, apiUrl, request, colors) {
 
             // Create a new document
           case 'create':
-            Documents.add(content, function(err, res) {
+            Documents.create(content, function(err, res) {
               if (err) {
-                vorpal.log(colors.red('Error: ' + err));
+                cli.log(colors.red('Error: ' + err));
+                return next();
               }
               if (res) {
                 Documents.current = res.document;
-                vorpal.log(colors.green(res.message));
-                vorpal.log('[Id: ' + colors.green(Documents.current._id) + '] ' + Documents.current.content);
+                cli.log(colors.green(res.message));
+                cli.log('[Id: ' + colors.green(Documents.current._id) + '] ' + Documents.current.content);
               }
               next();
             });
@@ -56,77 +92,31 @@ module.exports = function(vantage, apiUrl, request, colors) {
             // Update a document
             // The one in session if no coc ID is provided
           case 'update':
-            if (args.hasOwnProperty('options')) {
-              // If the --id option is missing, set it to false
-              if (!args.options.hasOwnProperty('id')) {
-                args.options.id = null;
-              }
-            } else {
-              args.options = {
-                id: null
-              };
-            }
-
-            vorpal.log(args);
-
-            // if no doc ID was provided, use one in session if exists
-            if (!args.options.id) {
-              if (Documents.current) {
-                args.options.id = Documents.current._id;
-              } else {
-                vorpal.log(colors.grey('Please select the document or provide the Id of the document to be able to update it.'));
-
-                vorpal.log(colors.yellow('Use command: select <document_id>'));
-                vorpal.log(colors.yellow('Or: doc --id <document_id> update [new content...]'));
-                next();
-              }
-            }
-
             // only make a request to the server if the ID exists
-            if (args.options.id) {
-              Documents.update(content, args.options.extend, args.options.id, function(err, res) {
-                if (err) {
-                  vorpal.log(colors.red('Error: ' + err));
-                }
-                if (res) {
-                  Documents.current = res.document;
-                  // vorpal.log(colors.green(res.message));
-                  vorpal.log('[Id: ' + colors.green(Documents.current._id) + '] ' + Documents.current.content);
-                }
-                next();
-              });
-            }
+            Documents.update(content, args.options.extend, args.options.id, function(err, res) {
+              if (err) {
+                cli.log(colors.red('Error: ' + err));
+                return next();
+              }
+              if (res) {
+                Documents.current = res.document;
+                // cli.log(colors.green(res.message));
+                cli.log('[Id: ' + colors.green(Documents.current._id) + '] ' + Documents.current.content);
+              }
+              next();
+            });
             break;
 
             // Delete a document
             // The one in session if no coc ID is provided
           case 'delete':
-            if (args.hasOwnProperty('options')) {
-              // If the --id option is missing, set it to false
-              if (!args.options.hasOwnProperty('id')) {
-                args.options.id = false;
-              }
-            } else {
-              args.options = {
-                id: false
-              };
-            }
-
-            // if a document is in sessions
-            if (!args.options.id && Documents.current) {
-              args.options.id = Documents.current._id;
-            } else {
-              vorpal.log(colors.grey('Please select the document you are updating.'));
-              vorpal.log(colors.yellow('Use command: select <document_id>'));
-            }
-
             Documents.delete(args.options.id, function(err, res) {
               if (err) {
-                vorpal.log(colors.red('Error: ' + err));
+                cli.log(colors.red('Error: ' + err));
               }
               if (res) {
                 Documents.current = undefined;
-                vorpal.log(colors.green(res.message));
+                cli.log(colors.green(res.message));
               }
               next();
             });
@@ -135,16 +125,16 @@ module.exports = function(vantage, apiUrl, request, colors) {
           case 'search':
             Documents.search(args.content, function(err, res) {
               if (err) {
-                vorpal.log(colors.red('Error: ' + err));
-                next();
+                cli.log(colors.red('Error: ' + err));
+                return next();
               }
 
               if (res.documents.length > 0) {
                 res.documents.forEach(function(doc) {
-                  vorpal.log('[Id: ' + colors.green(doc._id) + '] ' + doc.content);
+                  cli.log('[Id: ' + colors.green(doc._id) + '] ' + doc.content);
                 });
               } else {
-                vorpal.log(colors.yellow(res.message));
+                cli.log(colors.yellow(res.message));
               }
               next();
             });
@@ -153,14 +143,16 @@ module.exports = function(vantage, apiUrl, request, colors) {
             // Document in session
           case 'session':
             if (Documents.current) {
-              vorpal.log('[Id: ' + colors.green(Documents.current._id) + '] ' + Documents.current.content);
+              cli.log('[Id: ' + colors.green(Documents.current._id) + '] ' + Documents.current.content);
+              return next();
             }
+            cli.log('You are not editing any document.');
             next();
             break;
 
           default:
-            next();
-            break;
+            cli.log('Unknown command issued.'.yellow);
+            return next();
         }
       }
     });
@@ -170,15 +162,16 @@ module.exports = function(vantage, apiUrl, request, colors) {
     .alias('sel')
     .description('Select a document to be one updated/extended or deleted')
     .action(function(args, next) {
-      var vorpal = this;
+      var cli = this;
       Documents.find(args.documentId, function(err, res) {
         if (err) {
-          vorpal.log(colors.red('Error: ' + err));
+          cli.log(colors.red('Error: ' + err));
+          return next();
         }
 
         if (res) {
           Documents.current = res.document;
-          vorpal.log('[Id: ' + colors.green(Documents.current._id).underline + '] ' + Documents.current.content);
+          cli.log('[Id: ' + colors.green(Documents.current._id).underline + '] ' + Documents.current.content);
         }
         next();
       });

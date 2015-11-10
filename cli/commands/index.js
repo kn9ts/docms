@@ -1,4 +1,8 @@
-module.exports = function(app, vantage, request, colors) {
+var vantage = require('vantage')(),
+  request = require('superagent'),
+  colors = require('colors');
+
+module.exports = function(app) {
 
   var apiUrl = 'http://localhost:3000/api';
   require('./utilities')(vantage, apiUrl, request, colors);
@@ -10,8 +14,10 @@ module.exports = function(app, vantage, request, colors) {
   // and show the Vantage prompt.
   vantage
     .delimiter('document-cli~$'.white)
-    .listen(app, 3890, function(socket) {
+    .listen(app, 3102, function(socket) {
       this.log(colors.green('Let\'s sail.\n'));
     })
     .show();
+
+  return vantage;
 };

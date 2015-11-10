@@ -1,15 +1,12 @@
+'use strict';
 module.exports = function(router, config) {
-  require('./users')(router, config);
-  require('./documents')(router, config);
-  require('./sessions')(router, config);
+  var controller = require('../controllers'),
+    auth = controller.App.authorise;
+
+  require('./users')(router, auth, controller.Users);
+  require('./documents')(router, auth, controller.Documents);
 
   /* GET the API status */
-  router.get('/status', function(req, res, next) {
-    res.status(200).json({
-      status: 200,
-      message: 'Up and running. All is well.'
-    });
-  });
-
+  router.get('/', auth, controller.App.status);
   return router;
 };

@@ -1,19 +1,23 @@
+// load the applications environment
+require('dotenv').load();
+
 var express = require('express'),
+  app = express(),
   path = require('path'),
-  env = process.env.NODE_ENV || 'development',
-  config = require('./server/config').getEnvironment(env),
+  config = require('./server/config')(process.env.NODE_ENV),
   // favicon = require('serve-favicon'),
-  logger = require('morgan'),
+  morgan = require('morgan'),
   cookieParser = require('cookie-parser'),
   bodyParser = require('body-parser'),
   session = require('express-session'),
   MongoStore = require('connect-mongo')(session),
-  Mongoose = require('./server/config/database'),
+  models = require('./server/models'),
   routes = require('./server/routes'),
-  app = express(),
-  vantage = require('vantage')(),
-  request = require('superagent'),
-  colors = require('colors');
+  jwt = require('jsonwebtoken');
+
+app.set('jwt', jwt);
+app.set('superSecret', config.webTokenSecret);
+app.set('models', models);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'server/views'));
@@ -21,14 +25,13 @@ app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-
 // uncomment if you want to debug/log
-app.use(logger('combined', {
-  skip: function(req, res) {
-    // console.log(res.body);
-    return res.statusCode < 400;
-  }
-}));
+// app.use(morgan('combined', {
+//   skip: function(req, res) {
+//     // console.log(res.body);
+//     return res.statusCode < 400;
+//   }
+// }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false
@@ -39,11 +42,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, './public')));
 app.use(session({
   secret: config.expressSessionKey,
+  maxAge: new Date(Date.now() + 3600000),
   proxy: true,
   resave: true,
   saveUninitialized: true,
   store: new MongoStore({
-    mongooseConnection: Mongoose.connection
+    mongooseConnection: models.mongoose.connection
   })
 }));
 
@@ -57,10 +61,13 @@ app.use(function(req, res, next) {
 });
 
 // handle OPTIONS requests from the browser
-app.options("*", function(req, res, next) {
-  res.send(200);
+app.options("*", function(req, res) {
+  res.send(200).json({
+    message: 'Hello client!'
+  });
 });
 
+// get an instance of the router for api routes
 var apiRouter = express.Router();
 app.use('/api', routes(apiRouter, config));
 
@@ -72,34 +79,24 @@ app.use(function(req, res, next) {
 });
 
 // error handlers
-
-// development error handler
-// will print stacktrace
-if (env === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
-    next();
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
+  // get the error stack
+  var stack = err.stack.split(/\n/).map(function(err, index) {
+    return err.replace(/\s{2,}/g, ' ').trim();
+  });
+  res.json({
+    api: err,
+    url: req.originalUrl,
+    error: err.message,
+    stack: stack
   });
 });
 
 var server = app.listen(process.env.PORT || 3000, function() {
   // console.log('Express server listening on %d, in %s mode \n', 3000, app.get('env'));
   var initVantage = require('./cli/commands');
-  initVantage(app, vantage, request, colors);
+  initVantage(app);
 });
 
 module.exports = app;

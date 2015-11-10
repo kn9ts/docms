@@ -1,14 +1,16 @@
 'use strict';
-module.exports = function(request, apiUrl) {
+module.exports = function(request, vantage, apiUrl) {
   function Documents() {}
   Documents.prototype = {
     // Get all documents, and list them
     all: function(cb) {
       request
         .get([apiUrl, '/documents'].join(''))
+        .set('X-Access-Token', vantage.authToken || null)
         .end(function(err, res) {
           if (err) {
             cb(err, null);
+            return;
           }
           if (res.status === 200) {
             cb(null, res.body);
@@ -24,9 +26,11 @@ module.exports = function(request, apiUrl) {
     find: function(documentId, cb) {
       request
         .get([apiUrl, '/documents/', documentId].join(''))
+        .set('X-Access-Token', vantage.authToken || null)
         .end(function(err, res) {
           if (err) {
             cb(err, null);
+            return;
           }
           if (res.status === 200) {
             cb(null, res.body);
@@ -37,15 +41,17 @@ module.exports = function(request, apiUrl) {
     },
 
     // Create a new document
-    add: function(content, cb) {
+    create: function(content, cb) {
       request
         .post([apiUrl, '/documents'].join(''))
+        .set('X-Access-Token', vantage.authToken || null)
         .send({
           content: content
         })
         .end(function(err, res) {
           if (err) {
             cb(err, null);
+            return;
           }
           if (res.status === 200) {
             cb(null, res.body);
@@ -59,12 +65,14 @@ module.exports = function(request, apiUrl) {
     update: function(content, extend, documentId, cb) {
       request
         .put([apiUrl, '/documents/', documentId].join(''))
+        .set('X-Access-Token', vantage.authToken || null)
         .send({
           content: content
         })
         .end(function(err, res) {
           if (err) {
             cb(err, null);
+            return;
           }
           if (res.status === 200) {
             cb(null, res.body);
@@ -77,10 +85,12 @@ module.exports = function(request, apiUrl) {
     // Delete document in session or the [one] with the id provided
     delete: function(documentId, cb) {
       request
-        .delete([apiUrl, '/documents/', documentId].join(''))
+        .del([apiUrl, '/documents/', documentId].join(''))
+        .set('X-Access-Token', vantage.authToken || null)
         .end(function(err, res) {
           if (err) {
             cb(err, null);
+            return;
           }
           if (res.status === 200) {
             cb(null, res.body);
@@ -94,9 +104,11 @@ module.exports = function(request, apiUrl) {
     search: function(term, cb) {
       request
         .get([apiUrl, '/documents/search/', term].join(''))
+        .set('X-Access-Token', vantage.authToken || null)
         .end(function(err, res) {
           if (err) {
             cb(err, null);
+            return;
           }
           if (res.status === 200) {
             cb(null, res.body);
