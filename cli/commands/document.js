@@ -154,26 +154,33 @@ module.exports = function(vantage, apiUrl, request, colors) {
             cli.log('Unknown command issued.'.yellow);
             return next();
         }
+      } else {
+        next();
       }
     });
 
   // Select a document to persist in memory when editting
-  vantage.command('select <documentId> [newUpdatedContent]')
+  vantage.command('select <documentId>')
     .alias('sel')
     .description('Select a document to be one updated/extended or deleted')
     .action(function(args, next) {
       var cli = this;
-      Documents.find(args.documentId, function(err, res) {
-        if (err) {
-          cli.log(colors.red('Error: ' + err));
-          return next();
-        }
+      if (args.hasOwnProperty('documentId')) {
+        Documents.find(args.documentId, function(err, res) {
+          if (err) {
+            cli.log(colors.red('Error: ' + err));
+            return next();
+          }
 
-        if (res) {
-          Documents.current = res.document;
-          cli.log('[Id: ' + colors.green(Documents.current._id).underline + '] ' + Documents.current.content);
-        }
+          if (res) {
+            Documents.current = res.document;
+            cli.log('[Id: ' + colors.green(Documents.current._id).underline + '] ' + Documents.current.content);
+          }
+          next();
+        });
+      } else {
+        cli.log(colors.grey('No document ID provided'));
         next();
-      });
+      }
     });
 };

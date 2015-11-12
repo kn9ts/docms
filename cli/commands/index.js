@@ -1,12 +1,12 @@
-var vantage = require('vantage')(),
-  request = require('superagent'),
-  colors = require('colors');
-
 module.exports = function(app) {
+  var vantage = require('vantage')(),
+    request = require('superagent'),
+    colors = require('colors'),
+    apiUrl = 'http://localhost:3000/api';
 
-  var apiUrl = 'http://localhost:3000/api';
   require('./utilities')(vantage, apiUrl, request, colors);
   require('./user')(vantage, apiUrl, request, colors);
+  require('./role')(vantage, apiUrl, request, colors);
   require('./document')(vantage, apiUrl, request, colors);
 
   // Name your prompt delimiter

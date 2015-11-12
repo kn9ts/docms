@@ -6,7 +6,6 @@ var mongoose = require('../config/database'),
 
 // load models
 var models = [
-  'accessRights',
   'documents',
   'roles',
   'users'

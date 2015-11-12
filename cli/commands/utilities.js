@@ -56,9 +56,10 @@ module.exports = function(vantage, apiUrl, request, colors) {
   vantage.command('test')
     .description('Checks whether if user is logged in and which one.')
     .action(function(args, next) {
-      // var cli = this;
-      vantage.exec('isup').then(function(data) {
-        // cli.log(data);
+      var cli = this;
+      vantage.exec('login -u eugene -p password', function(err, data) {
+        cli.log(data);
+        next();
       });
       next();
     });

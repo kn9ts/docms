@@ -1,19 +1,20 @@
 'use strict';
-var bcrypt = require('bcrypt');
+var bcrypt = require('bcrypt'),
+  jwt = require('jsonwebtoken'),
+  Users = function() {};
 
-var Users = function() {};
 Users.prototype = {
   login: function(req, res, next) {
     var Users = req.app.get('models').Users;
-
     if (req.body.username && req.body.password) {
       Users.findOne({
           username: req.body.username
         })
+        .populate('role')
         .exec(function(err, user) {
           if (err) {
             err = new Error('[server error] ' + err.message);
-            next(err);
+            return next(err);
           }
 
           // if no errors and a user was found
@@ -29,15 +30,14 @@ Users.prototype = {
                   user.token = undefined;
                   // if user is found and password is right
                   // create a token
-                  user.token = req.app.get('jwt')
-                    .sign(user, req.app.get('superSecret'), {
-                      expiresIn: 1440 * 60 // expires in 24 hours
-                    });
+                  user.token = jwt.sign(user, req.app.get('superSecret'), {
+                    expiresIn: 1440 * 60 // expires in 24 hours
+                  });
 
                   user.save(function(err) {
                     if (err) {
                       err.details = '[server error] Failed to save token.';
-                      next(err);
+                      return next(err);
                     } else {
                       user.password = undefined;
                       res.status(200).json({
@@ -49,26 +49,45 @@ Users.prototype = {
                 } else {
                   err = new Error('Oops! Password provided do not match with the one stored within the system.');
                   err.status = 416;
-                  next(err);
+                  return next(err);
                 }
               });
           } else {
             err = new Error('The username specified does not exist. Create one?');
             err.status = 404;
-            next(err);
+            return next(err);
           }
         });
     } else {
       var err = new Error('Please provide both username and password to login.');
       err.status = 416;
-      next(err);
+      return next(err);
     }
+  },
+  logout: function(req, res, next) {
+    var Users = req.app.get('models').Users;
+    Users.findOne({
+      _id: req.decoded._id
+    }, function(err, user) {
+      if (err) {
+        return next(err);
+      }
+      user.token = null;
+      user.save(function(err) {
+        if (err) {
+          return next(err);
+        }
+        res.status(200).json({
+          message: 'User has been logged out'
+        });
+      });
+    });
   },
   all: function(req, res, next) {
     var Users = req.app.get('models').Users;
     Users.find({}).exec(function(err, users) {
       if (err) {
-        next(err);
+        return next(err);
       }
       if (users.length > 0) {
         res.status(200).json({
@@ -77,7 +96,7 @@ Users.prototype = {
       } else {
         res.status(200).json({
           users: users,
-          message: 'No users currently added.'
+          message: 'No users exist.'
         });
       }
     });
@@ -88,57 +107,105 @@ Users.prototype = {
       _id: req.params.id
     }, function(err, user) {
       if (err) {
-        next(err);
+        return next(err);
       }
       res.status(200).json(user);
     });
   },
   create: function(req, res, next) {
     var Users = req.app.get('models').Users;
-    if (req.body.username && req.body.password) {
-      // 1st encrypt the user's password and then add them to the DB
-      bcrypt.hash(req.body.password, 10, function(err, hashedPassword) {
-        if (err) {
-          next(err);
+    if (req.body.username && req.body.password && req.body.email && req.body.firstname && req.body.lastname) {
+
+      Users.findOne({
+        username: req.body.username,
+        email: req.body.emailaddress
+      }).exec(function(err, user) {
+        // no errors and a user was found
+        if (!err && user) {
+          err = new Error('Conflict emerged. User with username:' + req.body.username + ' exists.');
+          err.status = 409;
+          return next(err);
         }
 
-        var userDetails = {
-          username: req.body.username,
-          password: hashedPassword
-        };
-        var newUser = new Users(userDetails);
-        newUser.save(function(err) {
-          if (!err) {
-            res.status(200).json({
-              user: newUser,
-              message: 'You have successfully been added to the system\'s database.'
-            });
-          } else {
-            // 416 - requested range not satisfied
-            err = new Error('Oops! Something went wrong. Please try one more time.');
-            err.status = 416;
-            next(err);
+        // if no user was found but an error occured
+        if (err && !user) {
+          return next(err);
+        }
+
+        // no error anf a user was found.
+        // 1st encrypt the user's password and then add them to the DB
+        bcrypt.hash(req.body.password, 10, function(err, hashedPassword) {
+          if (err) {
+            return next(err);
           }
+          var userDetails = {
+            username: req.body.username,
+            password: hashedPassword,
+            email: req.body.emailaddress,
+            name: {
+              first: req.body.firstname,
+              last: req.body.lastname
+            }
+          };
+
+          // if a role was given, as a valid one, set it
+          if (req.body.role && !(/(viewer|admin|user)/.test(req.body.role))) {
+            err = new Error('Role should be either viewer, user or admin.');
+            err.status = 403;
+            return next(err);
+          } else {
+            req.body.role = 'viewer';
+          }
+
+          var Roles = req.app.get('models').Roles;
+          Roles.findOne({
+              title: req.body.role
+            })
+            .exec(function(err, role) {
+              if (err) {
+                err = new Error('Such a role does not exist.');
+                return next(err);
+              }
+              // is the document public?
+              if (role) {
+                userDetails.role = role._id;
+                // Finally create the user
+                var newUser = new Users(userDetails);
+                newUser.save(function(err) {
+                  if (!err) {
+                    res.status(200).json({
+                      user: newUser,
+                      message: 'You have successfully been added to the system\'s database.'
+                    });
+                  } else {
+                    // 416 - requested range not satisfied
+                    err = new Error('Oops! Something went wrong. User not created.');
+                    err.status = 416;
+                    return next(err);
+                  }
+                });
+              }
+            });
         });
       });
     } else {
-      var err = new Error('Please provide both username and password to create an account.');
+      var err = new Error('You are required to provide username, password, email, firstname and lastname.');
       err.status = 416;
-      next(err);
+      return next(err);
     }
   },
   update: function(req, res, next) {
     var Users = req.app.get('models').Users;
-    Users.findByIdAndUpdate(req.params.id, req.body).exec(function(err, user) {
+    Users.findByIdAndUpdate(req.decoded._id, req.body).exec(function(err, user) {
       if (err) {
-        err = new Error('An error occured when updating the document. Please make sure the ID given is for an existing document.');
-        next(err);
+        err = new Error('User does not exist.');
+        return next(err);
       }
       if (user) {
         // show the updated content
         res.status(200).json({
-          document: user,
-          message: 'Document updated successfully.'
+          user: user,
+          message: 'User updated successfully.'
         });
       }
     });
@@ -148,13 +215,13 @@ Users.prototype = {
     Users.findById(req.params.id).exec(function(err, user) {
       if (err) {
         err = new Error('User with ID:' + req.params.id + ' can not be found.');
-        next(err);
+        return next(err);
       }
       if (user) {
         // delete him
         user.remove(function(err) {
           if (err) {
-            next(err);
+            return next(err);
           } else {
             res.status(200).json({
               message: 'Poof! And the user is deleted.'
@@ -173,6 +240,26 @@ Users.prototype = {
       user: req.decoded,
       message: 'You are logged in as ' + req.decoded.username
     });
+  },
+  documents: function(req, res, next) {
+    var Users = req.app.get('models').Users;
+    Users.findById(req.params.id)
+      .populate('docsCreated')
+      .exec(function(err, user) {
+        if (err) {
+          return next(err);
+        }
+        if (user.hasOwnProperty('docsCreated') && user.docsCreated.length > 0) {
+          res.status(200).json({
+            documents: user.docsCreated
+          });
+        } else {
+          res.status(200).json({
+            documents: user.docsCreated,
+            message: 'No documents found.'
+          });
+        }
+      });
   }
 };
 

@@ -1,22 +1,11 @@
 'use strict';
 module.exports = function(request, vantage, apiUrl) {
-  function User() {}
-  User.prototype = {
-    login: function(user, cb) {
+  function Roles() {}
+  Roles.prototype = {
+    // Get all roles, and list them
+    all: function(cb) {
       request
-        .post([apiUrl, '/users/login'].join(''))
-        .send(user)
-        .end(function(err, res) {
-          if (res.ok) {
-            cb(null, res.body);
-          } else {
-            cb(res.body.error, null);
-          }
-        });
-    },
-    logout: function(cb) {
-      request
-        .get([apiUrl, '/users/logout'].join(''))
+        .get([apiUrl, '/roles'].join(''))
         .set('X-Access-Token', vantage.authToken)
         .end(function(err, res) {
           if (res.ok) {
@@ -26,10 +15,13 @@ module.exports = function(request, vantage, apiUrl) {
           }
         });
     },
-    session: function(cb) {
+
+    // Create a new document
+    create: function(newRole, cb) {
       request
-        .get([apiUrl, '/users/session'].join(''))
+        .post([apiUrl, '/roles'].join(''))
         .set('X-Access-Token', vantage.authToken)
+        .send(newRole)
         .end(function(err, res) {
           if (res.ok) {
             cb(null, res.body);
@@ -38,10 +30,13 @@ module.exports = function(request, vantage, apiUrl) {
           }
         });
     },
-    create: function(user, cb) {
+
+    // Update the document in session or doc with DocumentId provided
+    update: function(usersRole) {
       request
-        .post([apiUrl, '/users'].join(''))
-        .send(user)
+        .put([apiUrl, '/users/role'].join(''))
+        .set('X-Access-Token', vantage.authToken)
+        .send(usersRole)
         .end(function(err, res) {
           if (res.ok) {
             cb(null, res.body);
@@ -50,26 +45,12 @@ module.exports = function(request, vantage, apiUrl) {
           }
         });
     },
-    update: function(userUpdates, cb) {
+
+    // Delete document in session or the [one] with the id provided
+    delete: function(roleTitle, cb) {
       request
-        .put([apiUrl, '/users'].join(''))
+        .del([apiUrl, '/roles/', roleTitle].join(''))
         .set('X-Access-Token', vantage.authToken)
-        .send(userUpdates)
-        .end(function(err, res) {
-          if (res.ok) {
-            cb(null, res.body);
-          } else {
-            cb(res.body.error, null);
-          }
-        });
-    },
-    delete: function(userId, cb) {
-      request
-        .del([apiUrl, '/users'].join(''))
-        .set('X-Access-Token', vantage.authToken)
-        .send({
-          userId: userId
-        })
         .end(function(err, res) {
           if (res.ok) {
             cb(null, res.body);
@@ -79,5 +60,6 @@ module.exports = function(request, vantage, apiUrl) {
         });
     }
   };
-  return new User();
+
+  return new Roles();
 };

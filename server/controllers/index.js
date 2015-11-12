@@ -5,10 +5,11 @@ var path = require('path'),
 var controllers = [
   'app',
   'documents',
-  'users'
+  'users',
+  'roles'
 ];
 
 // add them to be exported in one go
-controllers.forEach(function(controller) {
-  module.exports[ucFirst(controller)] = require(path.join(__dirname, controller));
+controllers.forEach(function(ctrl) {
+  module.exports[ucFirst(ctrl)] = require(path.join(__dirname, ctrl));
 });

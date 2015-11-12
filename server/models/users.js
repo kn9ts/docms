@@ -6,15 +6,24 @@ module.exports = function(mongoose, Schema) {
     username: {
       type: String,
       lowercase: true,
-      trim: true
+      trim: true,
+      unique: true
     },
     name: {
       first: String,
       last: String
     },
-    email: String,
+    email: {
+      type: String,
+      trim: true,
+      unique: true
+    },
     password: String,
     token: String,
+    role: {
+      type: Schema.Types.ObjectId,
+      ref: 'Roles'
+    },
     docsCreated: [{
       type: Schema.Types.ObjectId,
       ref: 'Documents'

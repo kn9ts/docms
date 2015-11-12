@@ -4,6 +4,9 @@ module.exports = function(api, auth, users) {
   api.route('/users/login')
     .post(users.login);
 
+  api.route('/users/logout')
+    .get(auth, users.logout);
+
   api.route('/users/session')
     .get(auth, users.session);
 
@@ -21,4 +24,7 @@ module.exports = function(api, auth, users) {
     .put(auth, users.update)
     // Delete the user
     .delete(auth, users.delete);
+
+  api.route('/users/:id/documents')
+    .get(auth, users.documents);
 };

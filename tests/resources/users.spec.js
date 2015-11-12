@@ -84,10 +84,8 @@ describe('User RESTful API tests', function() {
       .accept('application/json')
       .end(function(err, res) {
         if (res.ok) {
-          if (res.body.users.length === 0) {
-            _expect(res.body.users).to.be.ok();
-            _expect(res.body.users).to.be.an(Array);
-          } else {
+          _expect(res.body.users).to.be.an(Array);
+          if (res.body.users.length > 0) {
             _expect(res.body.users[0]._id).to.be.a('string');
             _expect(res.body.users[0].username).to.be.a('string');
           }
@@ -128,6 +126,33 @@ describe('User RESTful API tests', function() {
         if (res.ok) {
           _expect(res.body._id).to.be.a('string');
           _expect(res.body.username).to.be(newUser.username);
+        } else {
+          throw err;
+        }
+        done();
+      });
+  });
+
+  /**
+   * Display all the documents the user has created
+   * GET /users/{id}/documents
+   *
+   * @param  int  $id
+   * @return Response
+   */
+  it('should display all the documents the user has created.', function(done) {
+    request
+      .get([resourceApiUrl, user._id, 'documents'].join('/'))
+      .set('X-Access-Token', authToken)
+      .accept('application/json')
+      .end(function(err, res) {
+        if (res.ok) {
+          _expect(res.body.documents).to.be.an(Array);
+
+          if (res.body.documents.length > 0) {
+            _expect(res.body.documents[0]._id).to.be.a('string');
+            _expect(res.body.documents[0].content).to.be.a('string');
+          }
         } else {
           throw err;
         }

@@ -6,13 +6,9 @@ module.exports = function(request, vantage, apiUrl) {
     all: function(cb) {
       request
         .get([apiUrl, '/documents'].join(''))
-        .set('X-Access-Token', vantage.authToken || null)
+        .set('X-Access-Token', vantage.authToken)
         .end(function(err, res) {
-          if (err) {
-            cb(err, null);
-            return;
-          }
-          if (res.status === 200) {
+          if (res.ok) {
             cb(null, res.body);
           } else {
             cb(res.body.error, null);
@@ -26,13 +22,9 @@ module.exports = function(request, vantage, apiUrl) {
     find: function(documentId, cb) {
       request
         .get([apiUrl, '/documents/', documentId].join(''))
-        .set('X-Access-Token', vantage.authToken || null)
+        .set('X-Access-Token', vantage.authToken)
         .end(function(err, res) {
-          if (err) {
-            cb(err, null);
-            return;
-          }
-          if (res.status === 200) {
+          if (res.ok) {
             cb(null, res.body);
           } else {
             cb(res.body.error, null);
@@ -44,16 +36,12 @@ module.exports = function(request, vantage, apiUrl) {
     create: function(content, cb) {
       request
         .post([apiUrl, '/documents'].join(''))
-        .set('X-Access-Token', vantage.authToken || null)
+        .set('X-Access-Token', vantage.authToken)
         .send({
           content: content
         })
         .end(function(err, res) {
-          if (err) {
-            cb(err, null);
-            return;
-          }
-          if (res.status === 200) {
+          if (res.ok) {
             cb(null, res.body);
           } else {
             cb(res.body.error, null);
@@ -65,16 +53,12 @@ module.exports = function(request, vantage, apiUrl) {
     update: function(content, extend, documentId, cb) {
       request
         .put([apiUrl, '/documents/', documentId].join(''))
-        .set('X-Access-Token', vantage.authToken || null)
+        .set('X-Access-Token', vantage.authToken)
         .send({
           content: content
         })
         .end(function(err, res) {
-          if (err) {
-            cb(err, null);
-            return;
-          }
-          if (res.status === 200) {
+          if (res.ok) {
             cb(null, res.body);
           } else {
             cb(res.body.error, null);
@@ -86,13 +70,9 @@ module.exports = function(request, vantage, apiUrl) {
     delete: function(documentId, cb) {
       request
         .del([apiUrl, '/documents/', documentId].join(''))
-        .set('X-Access-Token', vantage.authToken || null)
+        .set('X-Access-Token', vantage.authToken)
         .end(function(err, res) {
-          if (err) {
-            cb(err, null);
-            return;
-          }
-          if (res.status === 200) {
+          if (res.ok) {
             cb(null, res.body);
           } else {
             cb(res.body.error, null);
@@ -104,13 +84,9 @@ module.exports = function(request, vantage, apiUrl) {
     search: function(term, cb) {
       request
         .get([apiUrl, '/documents/search/', term].join(''))
-        .set('X-Access-Token', vantage.authToken || null)
+        .set('X-Access-Token', vantage.authToken)
         .end(function(err, res) {
-          if (err) {
-            cb(err, null);
-            return;
-          }
-          if (res.status === 200) {
+          if (res.ok) {
             cb(null, res.body);
           } else {
             cb(res.body.error, null);

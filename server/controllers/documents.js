@@ -3,18 +3,27 @@ var Documents = function() {};
 Documents.prototype = {
   all: function(req, res, next) {
     var Documents = req.app.get('models').Documents;
-    // Get only public documents
-    Documents.find({
+    var scope;
+    // admin can view all documents
+    // everyone else can only view public and documents they created/own
+    if (req.decoded.role.title === 'admin') {
+      scope = {};
+    } else {
+      scope = {
         $or: [{
           isPrivate: false
         }, {
           _creator: req.decoded._id
         }]
-      })
+      };
+    }
+
+    // Get public and documents user created
+    Documents.find(scope)
       .populate('_creator', '_id username name')
       .exec(function(err, docs) {
         if (err) {
-          next(err);
+          return next(err);
         }
         if (docs.length > 0) {
           res.status(200).json({
@@ -23,7 +32,7 @@ Documents.prototype = {
         } else {
           res.status(200).json({
             documents: docs,
-            message: 'No documents currently added.'
+            message: 'No documents exist.'
           });
         }
       });
@@ -35,7 +44,7 @@ Documents.prototype = {
       .exec(function(err, doc) {
         if (err) {
           err = new Error('Document with ID:' + req.params.id + ' does not exist.');
-          next(err);
+          return next(err);
         }
         // is the document public?
         if (doc && doc.isPrivate) {
@@ -43,22 +52,29 @@ Documents.prototype = {
             document: doc
           });
         }
-        // if not public(private), is the one requesting the document the owner
-        else if (doc._creator.id === req.decoded._id) {
+        // if it's private, is the one requesting the document the owner
+        else if (String(doc._creator._id) === String(req.decoded._id)) {
           res.status(200).json({
             document: doc
           });
         }
         // if none of the above, send back an auth error
         else {
-          err = new Error('Unauthorised. Only the document owner can view this document.');
+          err = new Error('Unauthorised. Only the owner can view this document.');
           err.status = 401;
-          next(err);
+          return next(err);
         }
       });
   },
   create: function(req, res, next) {
     if (req.body.content) {
+      // a viewer is not allowed to create a document
+      if (req.decoded.role.title === 'viewer') {
+        var err = new Error('As a viewer, you are not authorized to create documents.');
+        err.status = 401;
+        return next(err);
+      }
+
       var Documents = req.app.get('models').Documents;
       var Users = req.app.get('models').Users;
 
@@ -71,13 +87,13 @@ Documents.prototype = {
         var newDoc = new Documents();
         newDoc.content = req.body.content;
         newDoc.isPrivate = req.body.private;
-        // reference the owner of the document
+        // populate the owner of the document
         newDoc._creator = req.decoded._id;
         // save the document
         newDoc.save(function(err) {
           if (err) {
-            err = new Error('Oops! An error occured when creating your document.');
-            next(err);
+            err = new Error('Oops! Failed to create your document.');
+            return next(err);
           }
           // add document to user's collection
           user.docsCreated.push(newDoc);
@@ -98,15 +114,22 @@ Documents.prototype = {
       // 416 - Requested Range Not Satisfiable
       var err = new Error('No content provided to create a document.');
       err.status = 416;
-      next(err);
+      return next(err);
     }
   },
   update: function(req, res, next) {
+    // a viewer is not allowed to create a document
+    if (req.decoded.role.title === 'viewer') {
+      var err = new Error('As a viewer, you are not authorized to update documents.');
+      err.status = 401;
+      return next(err);
+    }
+
     var Documents = req.app.get('models').Documents;
     Documents.findByIdAndUpdate(req.params.id, req.body).exec(function(err, doc) {
       if (err) {
         err = new Error('Document with the given ID was not found thus no update was made.');
-        next(err);
+        return next(err);
       }
       if (doc) {
         // show the updated content
@@ -119,32 +142,45 @@ Documents.prototype = {
     });
   },
   delete: function(req, res, next) {
+    // a viewer is not allowed to create a document
+    if (req.decoded.role.title !== 'admin') {
+      var err = new Error('You are not authorized to delete documents.');
+      err.status = 401;
+      return next(err);
+    }
+
     var Documents = req.app.get('models').Documents;
     Documents.findById(req.params.id)
       .populate('_creator', '_id')
       .exec(function(err, doc) {
         if (err) {
           err = new Error('Document with ID:' + req.params.id + ' does not exist.');
-          next(err);
+          return next(err);
         }
-        // if the document exists and the request came from the doc _creator
-        if (doc && doc._creator._id === req.decoded._id) {
-          // delete it
-          doc.remove(function(err) {
-            if (err) {
-              err = new Error('Failed to delete. Please try again.');
-              next(err);
-            } else {
-              res.status(200).json({
-                message: 'Poof! And the document ceased to exist.'
-              });
-            }
-          });
+        // if the document exists
+        if (doc) {
+          // and the request came from the doc _creator
+          if (String(doc._creator._id) === String(req.decoded._id)) {
+            // delete it
+            doc.remove(function(err) {
+              if (err) {
+                err = new Error('Failed to delete. Please try again.');
+                return next(err);
+              } else {
+                res.status(200).json({
+                  message: 'Poof! And the document has been deleted.'
+                });
+              }
+            });
+          } else {
+            // 403 - Forbidden
+            err = new Error('Can not delete the document. You are not authorized.');
+            err.status = 403;
+            return next(err);
+          }
         } else {
-          // 403 - Forbidden
-          err = new Error('Can not delete the document. You are not authorized.');
-          err.status = 403;
-          next(err);
+          err = new Error('Document does not exist.');
+          return next(err);
         }
       });
   },
@@ -167,7 +203,7 @@ Documents.prototype = {
         .populate('_creator', '_id username name')
         .exec(function results(err, documentsFound) {
           if (err) {
-            next(err);
+            return next(err);
           }
           if (documentsFound.length > 0) {
             res.status(200).json({
@@ -184,7 +220,7 @@ Documents.prototype = {
     } else {
       var err = new Error('No search term provided.');
       err.status = 416;
-      next(err);
+      return next(err);
     }
   }
 };

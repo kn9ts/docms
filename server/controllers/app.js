@@ -1,5 +1,7 @@
 'use strict';
-var App = function() {};
+var jwt = require('jsonwebtoken'),
+  App = function() {};
+
 App.prototype = {
   status: function(req, res) {
     return res.status(200).json({
@@ -12,17 +14,16 @@ App.prototype = {
     // decode token
     if (token && token !== 'null') {
       // verifies secret and checks exp
-      req.app.get('jwt')
-        .verify(token, req.app.get('superSecret'), function(err, decoded) {
-          if (err) {
-            err = new Error('Failed to authenticate token.');
-            next(err);
-          } else {
-            // if everything is good, save to request for use in other routes
-            req.decoded = decoded;
-            next();
-          }
-        });
+      jwt.verify(token, req.app.get('superSecret'), function(err, decoded) {
+        if (err) {
+          err = new Error('Failed to authenticate token.');
+          return next(err);
+        } else {
+          // if everything is good, save to request for use in other routes
+          req.decoded = decoded;
+          next();
+        }
+      });
     } else {
       // if there is no token
       // return an error

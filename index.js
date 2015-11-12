@@ -12,10 +12,8 @@ var express = require('express'),
   session = require('express-session'),
   MongoStore = require('connect-mongo')(session),
   models = require('./server/models'),
-  routes = require('./server/routes'),
-  jwt = require('jsonwebtoken');
+  routes = require('./server/routes');
 
-app.set('jwt', jwt);
 app.set('superSecret', config.webTokenSecret);
 app.set('models', models);
 
@@ -99,4 +97,5 @@ var server = app.listen(process.env.PORT || 3000, function() {
   initVantage(app);
 });
 
-module.exports = app;
+//expose app
+exports = module.exports = app;
