@@ -4,10 +4,8 @@ module.exports = function (vantage, apiUrl, request, colors) {
   // Create document
   vantage.command('doc <action> [content...]')
     .alias('docs')
-    .alias('documents')
-    .option('-p, --private', 'Make the document private')
-    .option('-i, --id <document_id>',
-      'Select or reference the document by ID about to be altered')
+    .option('-p, --private', 'Make the document private, use this when creating the document')
+    .option('-i, --id <document_id>', 'reference the ID of the document you want to select and persist in session to manipulate')
     .description('Do document operations')
     .action(function (args, next) {
       var cli = this;
@@ -76,7 +74,7 @@ module.exports = function (vantage, apiUrl, request, colors) {
               if (res.documents && res.documents.length > 0) {
                 res.documents.forEach(function (doc) {
                   cli.log('[id: ' + colors.green(doc._id) +
-                    ' creator:' + doc._creator.username.cyan +
+                    '| creator:' + doc._creator.username.cyan +
                     '] ' + doc.content);
                 });
               } else {

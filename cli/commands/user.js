@@ -34,11 +34,6 @@ module.exports = function(vantage, apiUrl, request, colors) {
 
   // Create users
   vantage.command('create')
-    // .help(function(args, next) {
-    //   this.log('Use this to register yourself as user if you are not in part of the system already.');
-    //   this.log(colors.yellow('Example: create -u username -p password -e youremail@company.com -fn eugene -ln mutai'));
-    //   next();
-    // })
     .description('Use this to register yourself as user if you are not.\n' + colors.yellow('  Example: create -u username -p password -e yourname@company.com -f eugene -l mutai'))
     .option('-u, --username <username>', 'Enter your username')
     .option('-p, --password <password>', 'Enter your password')
@@ -47,7 +42,7 @@ module.exports = function(vantage, apiUrl, request, colors) {
     .option('-l, --lastname <lastname>', 'Enter your last name')
     .action(function(args, next) {
       var cli = this;
-      cli.log(args.options);
+      // cli.log(args.options);
       if (args.hasOwnProperty('options') && Object.keys(args.options).length === 5) {
         User.create(args.options, function(err, res) {
           if (err) {

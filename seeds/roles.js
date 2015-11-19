@@ -14,3 +14,5 @@ roles.forEach(function(role) {
     }
   });
 });
+
+process.exit(0);
