@@ -8,6 +8,6 @@ module.exports = function(router) {
   require('./documents')(router, auth, controller.Documents);
 
   /* GET the API status */
-  router.get('/', auth, controller.App.status);
+  router.all('/', auth, controller.App.status);
   return router;
 };

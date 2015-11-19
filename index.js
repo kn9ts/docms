@@ -26,10 +26,10 @@ app.set('view engine', 'jade');
 // uncomment if you want to debug/log
 // app.use(morgan('combined', {
 //   skip: function(req, res) {
-//     // console.log(res.body);
 //     return res.statusCode < 400;
 //   }
 // }));
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false
@@ -92,9 +92,9 @@ app.use(function(err, req, res, next) {
 });
 
 var server = app.listen(process.env.PORT || 3000, function() {
-  // console.log('Express server listening on %d, in %s mode \n', 3000, app.get('env'));
-  var initVantage = require('./cli/commands');
-  initVantage(app);
+  console.log('Express server listening on %d, in %s mode \n', 3000, app.get('env'));
+  // var initVantage = require('./cli/commands');
+  // initVantage(app);
 });
 
 //expose app

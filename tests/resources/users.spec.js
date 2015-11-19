@@ -7,7 +7,10 @@ describe('User RESTful API tests', function() {
 
   var newUser = {
       username: (faker.internet.userName()).toLowerCase(),
-      password: faker.internet.password()
+      password: faker.internet.password(),
+      email: faker.internet.email(),
+      firstname: faker.name.firstName(),
+      lastname: faker.name.lastName()
     },
     userInfoUpdates = {
       email: faker.internet.email(),

@@ -20,7 +20,7 @@ Mongoose.connection.on('disconnected', function() {
 // If the Node process ends, close the Mongoose connection
 process.on('SIGINT', function() {
   Mongoose.connection.close(function() {
-    console.log('Mongoose default connection disconnected through application termination');
+    console.log('Mongoose disconnected on application exit');
     process.exit(0);
   });
 });

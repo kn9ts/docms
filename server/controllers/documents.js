@@ -6,7 +6,7 @@ Documents.prototype = {
     var scope;
     // admin can view all documents
     // everyone else can only view public and documents they created/own
-    if (req.decoded.role.title === 'admin') {
+    if (req.decoded.role && req.decoded.role.title === 'admin') {
       scope = {};
     } else {
       scope = {
@@ -69,7 +69,7 @@ Documents.prototype = {
   create: function(req, res, next) {
     if (req.body.content) {
       // a viewer is not allowed to create a document
-      if (req.decoded.role.title === 'viewer') {
+      if (req.decoded.role && req.decoded.role.title === 'viewer') {
         var err = new Error('As a viewer, you are not authorized to create documents.');
         err.status = 401;
         return next(err);
@@ -119,7 +119,7 @@ Documents.prototype = {
   },
   update: function(req, res, next) {
     // a viewer is not allowed to create a document
-    if (req.decoded.role.title === 'viewer') {
+    if (req.decoded.role && req.decoded.role.title === 'viewer') {
       var err = new Error('As a viewer, you are not authorized to update documents.');
       err.status = 401;
       return next(err);
@@ -143,7 +143,7 @@ Documents.prototype = {
   },
   delete: function(req, res, next) {
     // a viewer is not allowed to create a document
-    if (req.decoded.role.title !== 'admin') {
+    if (req.decoded.role && req.decoded.role.title !== 'admin') {
       var err = new Error('You are not authorized to delete documents.');
       err.status = 401;
       return next(err);

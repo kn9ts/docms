@@ -5,22 +5,25 @@ var request = require('superagent'),
   faker = require('faker'),
   _expect = require('expect.js'),
   resourceApiUrl = 'http://localhost:3000/api/roles',
-  underscore = require('underscore'),
+  _u = require('underscore'),
   bcrypt = require('bcrypt'),
-  mongoose = require('../../server/config/database'),
-  Schema = mongoose.Schema,
-  Users = require('../../server/models/users')(mongoose, Schema);
+  mongoose = require('../../server/config/database');
 
+var models = mongoose.modelNames();
+if (_u.contains(models, 'Users')) {
+  Users = mongoose.model('Users');
+} else {
+  var Schema = mongoose.Schema;
+  Users = require('../../server/models/users')(mongoose, Schema);
+}
 
 describe('roles RESTful API tests', function() {
   var user = {
       username: (faker.internet.userName()).toLowerCase(),
       password: faker.internet.password(),
       email: faker.internet.email(),
-      name: {
-        first: faker.name.firstName(),
-        last: faker.name.lastName()
-      }
+      firstname: faker.name.firstName(),
+      lastname: faker.name.lastName()
     },
     newRole = {
       title: 'viewer'
@@ -52,7 +55,7 @@ describe('roles RESTful API tests', function() {
    *
    * @return Response
    */
-  it('should not return any roles. Let document know he/she is unauthorised', function(done) {
+  it('should not return any roles. Let them know he/she is unauthorised', function(done) {
     request
       .get(resourceApiUrl)
       .accept('application/json')
@@ -75,19 +78,17 @@ describe('roles RESTful API tests', function() {
       .send(user)
       .accept('application/json')
       .end(function(err, res) {
-        if (res.ok) {
-          var data = res.body.user;
-          _expect(res.body.message).to.be.a('string');
-          _expect(data.username).to.be(user.username);
-          _expect(data._id).to.be.a('string');
+        _expect(res.status).to.be(200);
 
-          // check if the token has been issued out
-          _expect(data.token).to.be.a('string');
-          _expect(data.token.length).to.be.greaterThan(100);
-          authToken = data.token;
-        } else {
-          throw err;
-        }
+        var data = res.body.user;
+        _expect(res.body.message).to.be.a('string');
+        _expect(data.username).to.be(user.username);
+        _expect(data._id).to.be.a('string');
+
+        // check if the token has been issued out
+        _expect(data.token).to.be.a('string');
+        _expect(data.token.length).to.be.greaterThan(100);
+        authToken = data.token;
         done();
       });
   });
@@ -140,7 +141,7 @@ describe('roles RESTful API tests', function() {
           _expect(res.body.message).to.be.a('string');
           role = data;
         } else if (res.status > 400) {
-          _expect(res.status).to.be.within(403, 409);
+          _expect(res.status).to.be.within(400, 599);
           _expect(res.body.error).to.be.a('string');
         } else {
           throw err;
@@ -155,21 +156,23 @@ describe('roles RESTful API tests', function() {
    *
    * @return Response
    */
-  it('should NOT store a role with any other title other than viewer, user and admin', function(done) {
-    var role = {
-      title: (faker.internet.userName()).toLowerCase(),
-    };
-    request
-      .post(resourceApiUrl)
-      .set('X-Access-Token', authToken)
-      .send(role)
-      .accept('application/json')
-      .end(function(err, res) {
-        _expect(res.status).to.be(403);
-        _expect(res.body.error).to.be.a('string');
-        done();
-      });
-  });
+  it(
+    'should NOT store a role with any other title other than viewer, user and admin',
+    function(done) {
+      var role = {
+        title: (faker.internet.userName()).toLowerCase(),
+      };
+      request
+        .post(resourceApiUrl)
+        .set('X-Access-Token', authToken)
+        .send(role)
+        .accept('application/json')
+        .end(function(err, res) {
+          _expect(res.status).to.be(403);
+          _expect(res.body.error).to.be.a('string');
+          done();
+        });
+    });
 
   /**
    * Display the specified resource.

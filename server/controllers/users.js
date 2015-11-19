@@ -117,12 +117,15 @@ Users.prototype = {
     if (req.body.username && req.body.password && req.body.email && req.body.firstname && req.body.lastname) {
 
       Users.findOne({
-        username: req.body.username,
-        email: req.body.emailaddress
+        $or: [{
+          email: req.body.emailaddress
+        }, {
+          username: req.body.username
+        }]
       }).exec(function(err, user) {
         // no errors and a user was found
         if (!err && user) {
-          err = new Error('Conflict emerged. User with username:' + req.body.username + ' exists.');
+          err = new Error('Conflict! User with username:' + user.username + ' exists.');
           err.status = 409;
           return next(err);
         }
@@ -132,12 +135,13 @@ Users.prototype = {
           return next(err);
         }
 
-        // no error anf a user was found.
+        // no error and a user was not found.
         // 1st encrypt the user's password and then add them to the DB
         bcrypt.hash(req.body.password, 10, function(err, hashedPassword) {
           if (err) {
             return next(err);
           }
+
           var userDetails = {
             username: req.body.username,
             password: hashedPassword,
@@ -149,7 +153,7 @@ Users.prototype = {
           };
 
           // if a role was given, as a valid one, set it
-          if (req.body.role && !(/(viewer|admin|user)/.test(req.body.role))) {
+          if (req.body.hasOwnProperty('role') && !(/(viewer|admin|user)/.test(req.body.role))) {
             err = new Error('Role should be either viewer, user or admin.');
             err.status = 403;
             return next(err);
@@ -163,8 +167,9 @@ Users.prototype = {
             })
             .exec(function(err, role) {
               if (err) {
-                err = new Error('Such a role does not exist.');
-                return next(err);
+                var e = new Error('Such a role does not exist.');
+                e.error = err;
+                return next(e);
               }
               // is the document public?
               if (role) {
@@ -179,9 +184,10 @@ Users.prototype = {
                     });
                   } else {
                     // 416 - requested range not satisfied
-                    err = new Error('Oops! Something went wrong. User not created.');
-                    err.status = 416;
-                    return next(err);
+                    var e = new Error('Oops! Something went wrong. User not created.');
+                    e.error = err;
+                    e.status = 416;
+                    return next(e);
                   }
                 });
               }

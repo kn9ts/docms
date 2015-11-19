@@ -1,4 +1,4 @@
-module.exports = function(vantage, apiUrl, request, colors) {
+module.exports = function (vantage, apiUrl, request, colors) {
   var Documents = require('../controllers/document')(request, vantage, apiUrl);
 
   // Create document
@@ -6,20 +6,27 @@ module.exports = function(vantage, apiUrl, request, colors) {
     .alias('docs')
     .alias('documents')
     .option('-p, --private', 'Make the document private')
-    .option('-i, --id <document_id>', 'Select or reference the document by ID about to be altered')
+    .option('-i, --id <document_id>',
+      'Select or reference the document by ID about to be altered')
     .description('Do document operations')
-    .action(function(args, next) {
+    .action(function (args, next) {
       var cli = this;
       // cli.log(args, args.hasOwnProperty('action'));
       // doc add/create/update/extend/delete/search [content...]
       if (args.hasOwnProperty('action')) {
+
+        // Only run if a user is logged in, token issued
+        if (!vantage.authToken) {
+          cli.log(colors.yellow('Unauthorised. Please log in first.'));
+          return next();
+        }
+
         var content;
         if (args.content) {
           content = args.content.join(' ');
           // If add is used replace with create
           args.action.replace('add', 'create');
         }
-        cli.log(args);
 
         // Have the document options been provided
         if (args.hasOwnProperty('options')) {
@@ -46,9 +53,13 @@ module.exports = function(vantage, apiUrl, request, colors) {
             if (Documents.current) {
               args.options.id = Documents.current._id;
             } else {
-              cli.log(colors.grey('Please select the document or provide the Id of the document to be manage it.'));
+              cli.log(colors.grey(
+                'Please select the document or provide the Id of the document to be manage it.'
+              ));
               cli.log(colors.yellow('Use command: select <document_id>'));
-              cli.log(colors.yellow('Or: doc --id <document_id> update/delete [new content here if updating...]'));
+              cli.log(colors.yellow(
+                'Or: doc --id <document_id> update/delete [new content here if updating...]'
+              ));
               return next();
             }
           }
@@ -57,14 +68,16 @@ module.exports = function(vantage, apiUrl, request, colors) {
         switch (args.action) {
           // Get all documents, and list them
           case 'all':
-            Documents.all(function(err, res) {
+            Documents.all(function (err, res) {
               if (err) {
                 cli.log(colors.red('Error: ' + err));
                 return next();
               }
               if (res.documents && res.documents.length > 0) {
-                res.documents.forEach(function(doc) {
-                  cli.log('[id: ' + colors.green(doc._id) + ' creator:' + doc._creator.username.cyan + '] ' + doc.content);
+                res.documents.forEach(function (doc) {
+                  cli.log('[id: ' + colors.green(doc._id) +
+                    ' creator:' + doc._creator.username.cyan +
+                    '] ' + doc.content);
                 });
               } else {
                 cli.log(colors.yellow(res.message));
@@ -75,7 +88,7 @@ module.exports = function(vantage, apiUrl, request, colors) {
 
             // Create a new document
           case 'create':
-            Documents.create(content, function(err, res) {
+            Documents.create(content, function (err, res) {
               if (err) {
                 cli.log(colors.red('Error: ' + err));
                 return next();
@@ -83,7 +96,8 @@ module.exports = function(vantage, apiUrl, request, colors) {
               if (res) {
                 Documents.current = res.document;
                 cli.log(colors.green(res.message));
-                cli.log('[Id: ' + colors.green(Documents.current._id) + '] ' + Documents.current.content);
+                cli.log('[Id: ' + colors.green(Documents.current._id) +
+                  '] ' + Documents.current.content);
               }
               next();
             });
@@ -93,24 +107,26 @@ module.exports = function(vantage, apiUrl, request, colors) {
             // The one in session if no coc ID is provided
           case 'update':
             // only make a request to the server if the ID exists
-            Documents.update(content, args.options.extend, args.options.id, function(err, res) {
-              if (err) {
-                cli.log(colors.red('Error: ' + err));
-                return next();
-              }
-              if (res) {
-                Documents.current = res.document;
-                // cli.log(colors.green(res.message));
-                cli.log('[Id: ' + colors.green(Documents.current._id) + '] ' + Documents.current.content);
-              }
-              next();
-            });
+            Documents.update(content, args.options.extend, args.options.id,
+              function (err, res) {
+                if (err) {
+                  cli.log(colors.red('Error: ' + err));
+                  return next();
+                }
+                if (res) {
+                  Documents.current = res.document;
+                  // cli.log(colors.green(res.message));
+                  cli.log('[Id: ' + colors.green(Documents.current._id) +
+                    '] ' + Documents.current.content);
+                }
+                next();
+              });
             break;
 
             // Delete a document
             // The one in session if no coc ID is provided
           case 'delete':
-            Documents.delete(args.options.id, function(err, res) {
+            Documents.delete(args.options.id, function (err, res) {
               if (err) {
                 cli.log(colors.red('Error: ' + err));
               }
@@ -123,15 +139,16 @@ module.exports = function(vantage, apiUrl, request, colors) {
             break;
 
           case 'search':
-            Documents.search(args.content, function(err, res) {
+            Documents.search(args.content, function (err, res) {
               if (err) {
                 cli.log(colors.red('Error: ' + err));
                 return next();
               }
 
               if (res.documents.length > 0) {
-                res.documents.forEach(function(doc) {
-                  cli.log('[Id: ' + colors.green(doc._id) + '] ' + doc.content);
+                res.documents.forEach(function (doc) {
+                  cli.log('[Id: ' + colors.green(doc._id) + '] ' +
+                    doc.content);
                 });
               } else {
                 cli.log(colors.yellow(res.message));
@@ -143,7 +160,8 @@ module.exports = function(vantage, apiUrl, request, colors) {
             // Document in session
           case 'session':
             if (Documents.current) {
-              cli.log('[Id: ' + colors.green(Documents.current._id) + '] ' + Documents.current.content);
+              cli.log('[Id: ' + colors.green(Documents.current._id) + '] ' +
+                Documents.current.content);
               return next();
             }
             cli.log('You are not editing any document.');
@@ -163,10 +181,17 @@ module.exports = function(vantage, apiUrl, request, colors) {
   vantage.command('select <documentId>')
     .alias('sel')
     .description('Select a document to be one updated/extended or deleted')
-    .action(function(args, next) {
+    .action(function (args, next) {
       var cli = this;
+
+      // Only run if a user is logged in, token issued
+      if (!vantage.authToken) {
+        cli.log(colors.yellow('Unauthorised. Please log in first.'));
+        return next();
+      }
+
       if (args.hasOwnProperty('documentId')) {
-        Documents.find(args.documentId, function(err, res) {
+        Documents.find(args.documentId, function (err, res) {
           if (err) {
             cli.log(colors.red('Error: ' + err));
             return next();
@@ -174,7 +199,8 @@ module.exports = function(vantage, apiUrl, request, colors) {
 
           if (res) {
             Documents.current = res.document;
-            cli.log('[Id: ' + colors.green(Documents.current._id).underline + '] ' + Documents.current.content);
+            cli.log('[Id: ' + colors.green(Documents.current._id).underline +
+              '] ' + Documents.current.content);
           }
           next();
         });
