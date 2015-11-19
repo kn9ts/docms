@@ -7,7 +7,7 @@
   "forin": true,
   "immed": true,
   "latedef": "nofunc",
-  "maxlen": 110,
+  "maxlen": 120,
   "newcap": true,
   "noarg": true,
   "noempty": true,
@@ -32,6 +32,7 @@
     "by",
     "browser",
     "todoapp"
+    "process"
   ],
   "quotmark": true,
   "trailing": true,
