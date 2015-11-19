@@ -41,7 +41,7 @@ So login 1st, this if you are signed up to the application.
 ```bash
 $ create -u eugene -p password -f Eugene -l Mutai -e eugenemutai@gmail.com
 ```
-| You have to provide your username(-u), password(-p), first name(-f), last name(-l) and your email address(-e).
+__Note:__ _You have to provide your username(-u), password(-p), first name(-f), last name(-l) and your email address(-e)._
 
 ##### Login
 ```bash
@@ -57,7 +57,7 @@ Once logged in you there are a couple of actions avaible to carry out on the doc
 ```bash
 $ doc create 'content of the document' [--private]
 ```
-*__NOTE:__* Once created. The document is added to the session and thus is the one persisted in the session. You can go ahead and update it.
+__NOTE:__ *Once created. The document is added to the session and thus is the one persisted in the session. You can go ahead and update it.*
 
 ##### Update
 ```bash
@@ -137,4 +137,4 @@ Then run:
 $ mocha tests/resources
 ```
 
-(c) 2015. Made with <3 by Eugene Mutai. #TIA
+__(c) 2015. Made with <3 by Eugene Mutai. #TIA__
