@@ -5,28 +5,28 @@ The system manages documents, users and user roles. Each document defines access
 
 Users are categorized by roles. Each user must have a role defined for them.
 
----
-
 ## Installation
-
 Open up your Terminal and clone this repo or download it to your machine:
 ```bash
 $ git clone https://github.com/kn9ts/docms.git
 ```
 
-Downloading: [Click here](https://github.com/kn9ts/docms/archive/master.zip)
+[Click here](https://github.com/kn9ts/docms/archive/master.zip) to download.
 
+#### Dependencies
 Once cloned or download(and unzipped), enter the directory and install all dependencies by running:
 
 ```bash
 $ npm install
 ```
 
+#### Seeding
 Once the dependencies have been installed, you have to seed the database with roles.
 
 ```bash
 $ node seeds/roles.js
 ```
+
 The seeding has not been perfected but `works` well. Wait for a second before pressing `CTRL + C` to terminate the process. Seeding is done in mere microseconds so terminating the app does not affect anything.
 
 Now the app is ready to be used.
@@ -47,6 +47,8 @@ $ create -u eugene -p password -f Eugene -l Mutai -e eugenemutai@gmail.com
 ```bash
 $ login -u eugene -p password
 ```
+
+---
 
 ### Actions you can carry out
 Once logged in you there are a couple of actions avaible to carry out on the documents database.
