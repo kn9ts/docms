@@ -121,3 +121,20 @@ $ doc search lorem
 ```
 
 If found, a list will be shown as when you list all documents.
+
+---
+
+## Testing
+To confirm the REST API is working. You could run the tests in the `tests/` folder. Make sure you have mocha installed globally first.
+
+```bash
+$ npm i mocha -g
+```
+
+Then run:
+
+```bash
+$ mocha tests/resources
+```
+
+(c) 2015. Made with <3 by Eugene Mutai. #TIA
