@@ -96,7 +96,7 @@ You can also do this without selecting it by passing the ID of the document as a
 $ doc update 'content of the document' --id 564dae1a9d9e1f2b54e7de96
 ```
 
-##### Update
+##### Delete
 Or delete it if you have permission.
 
 ```bash
