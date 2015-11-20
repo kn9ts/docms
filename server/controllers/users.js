@@ -7,9 +7,8 @@ Users.prototype = {
   login: function(req, res, next) {
     var Users = req.app.get('models').Users;
     if (req.body.username && req.body.password) {
-      Users.findOne({
-          username: req.body.username
-        })
+      Users.findOne()
+        .where('username').equals(req.body.username)
         .populate('role')
         .exec(function(err, user) {
           if (err) {
@@ -113,87 +112,88 @@ Users.prototype = {
     });
   },
   create: function(req, res, next) {
-    var Users = req.app.get('models').Users;
+    var Users = req.app.get('models').Users,
+      Roles = req.app.get('models').Roles;
+
     if (req.body.username && req.body.password && req.body.email && req.body.firstname && req.body.lastname) {
 
-      Users.findOne({
-        $or: [{
-          email: req.body.emailaddress
+      Users.findOne()
+        .or([{
+          email: req.body.email
         }, {
           username: req.body.username
-        }]
-      }).exec(function(err, user) {
-        // no errors and a user was found
-        if (!err && user) {
-          err = new Error('Conflict! User with username:' + user.username + ' exists.');
-          err.status = 409;
-          return next(err);
-        }
-
-        // if no user was found but an error occured
-        if (err && !user) {
-          return next(err);
-        }
-
-        // no error and a user was not found.
-        // 1st encrypt the user's password and then add them to the DB
-        bcrypt.hash(req.body.password, 10, function(err, hashedPassword) {
+        }])
+        .exec(function(err, user) {
+          // an error occured
           if (err) {
             return next(err);
           }
 
-          var userDetails = {
-            username: req.body.username,
-            password: hashedPassword,
-            email: req.body.emailaddress,
-            name: {
-              first: req.body.firstname,
-              last: req.body.lastname
-            }
-          };
-
-          // if a role was given, as a valid one, set it
-          if (req.body.hasOwnProperty('role') && !(/(viewer|admin|user)/.test(req.body.role))) {
-            err = new Error('Role should be either viewer, user or admin.');
-            err.status = 403;
+          // no errors and a user was found
+          if (user) {
+            err = new Error('Conflict! The email or username provided already exists in the system');
+            err.request = req.body;
+            err.status = 409;
             return next(err);
-          } else {
-            req.body.role = 'viewer';
           }
 
-          var Roles = req.app.get('models').Roles;
-          Roles.findOne({
-              title: req.body.role
-            })
-            .exec(function(err, role) {
-              if (err) {
-                var e = new Error('Such a role does not exist.');
-                e.error = err;
-                return next(e);
+          // no error and a user was not found.
+          // 1st encrypt the user's password and then add them to the DB
+          bcrypt.hash(req.body.password, 10, function(err, hashedPassword) {
+            if (err) {
+              return next(err);
+            }
+
+            var userDetails = {
+              username: req.body.username,
+              password: hashedPassword,
+              email: req.body.email,
+              name: {
+                first: req.body.firstname,
+                last: req.body.lastname
               }
-              // is the document public?
-              if (role) {
-                userDetails.role = role._id;
-                // Finally create the user
-                var newUser = new Users(userDetails);
-                newUser.save(function(err) {
-                  if (!err) {
-                    res.status(200).json({
-                      user: newUser,
-                      message: 'You have successfully been added to the system\'s database.'
-                    });
-                  } else {
-                    // 416 - requested range not satisfied
-                    var e = new Error('Oops! Something went wrong. User not created.');
-                    e.error = err;
-                    e.status = 416;
-                    return next(e);
-                  }
-                });
-              }
-            });
+            };
+
+            // if a role was given, as a valid one, set it
+            if (req.body.hasOwnProperty('role') && !(/(viewer|admin|user)/gi.test(req.body.role))) {
+              err = new Error('Role should be either viewer, user or admin.');
+              err.status = 403;
+              return next(err);
+            } else {
+              req.body.role = 'viewer';
+            }
+
+            Roles.findOne()
+              .where('title').equals(req.body.role)
+              .exec(function(err, role) {
+                if (err) {
+                  var newErr = new Error('Such a role does not exist.');
+                  newErr.error = err;
+                  return next(newErr);
+                }
+                // is the document public?
+                if (role) {
+                  userDetails.role = role._id;
+                  // Finally create the user
+                  var newUser = new Users(userDetails);
+                  newUser.save(function(err) {
+                    if (!err) {
+                      res.status(200).json({
+                        user: newUser,
+                        message: 'You have successfully been added to the system\'s database.'
+                      });
+                    } else {
+                      // 416 - requested range not satisfied
+                      var newErr = new Error('Oops! Something went wrong. User not created.');
+                      newErr.error = err;
+                      newErr.status = 416;
+                      return next(newErr);
+                    }
+                  });
+                }
+              });
+          });
         });
-      });
     } else {
       var err = new Error('You are required to provide username, password, email, firstname and lastname.');
       err.status = 416;
@@ -202,7 +202,7 @@ Users.prototype = {
   },
   update: function(req, res, next) {
     var Users = req.app.get('models').Users;
-    Users.findByIdAndUpdate(req.decoded._id, req.body).exec(function(err, user) {
+    Users.findByIdAndUpdate(req.params.id, req.body).exec(function(err, user) {
       if (err) {
         err = new Error('User does not exist.');
         return next(err);
