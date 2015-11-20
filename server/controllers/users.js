@@ -154,13 +154,15 @@ Users.prototype = {
               }
             };
 
+            if (!req.body.hasOwnProperty('role')) {
+              req.body.role = 'viewer';
+            }
+
             // if a role was given, as a valid one, set it
-            if (!req.body.hasOwnProperty('role') || !(/(viewer|admin|user)/gi.test(req.body.role))) {
+            if (!(/(viewer|admin|user)/gi.test(req.body.role))) {
               err = new Error('Role should be either viewer, user or admin.');
               err.status = 403;
               return next(err);
-            } else {
-              req.body.role = 'viewer';
             }
 
             Roles.findOne()
