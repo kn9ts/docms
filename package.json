@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node index.js",
-    "test": "mocha tests"
+    "test": "mocha tests/resources"
   },
   "browser": {},
   "repository": {
@@ -31,23 +31,14 @@
     "faker": "^3.0.1",
     "jade": "~1.11.0",
     "jsonwebtoken": "^5.4.1",
-    "karma": "^0.13.10",
-    "karma-chrome-launcher": "^0.2.1",
-    "karma-jasmine": "^0.3.6",
     "less-middleware": "1.0.x",
     "mocha": "^2.3.3",
-    "moment": "^2.10.6",
     "mongoose": "^4.1.11",
-    "mongoose-seeder": "^1.2.1",
     "morgan": "~1.6.1",
-    "node-env-file": "^0.1.7",
-    "promised-io": "^0.3.5",
-    "request": "^2.65.0",
     "serve-favicon": "~2.3.0",
     "superagent": "^1.4.0",
     "underscore": "^1.8.3",
-    "vantage": "^1.5.1",
-    "vorpal-log": "^1.0.1"
+    "vantage": "^1.5.1"
   },
   "engines": {
     "node": ">=0.12.5"
