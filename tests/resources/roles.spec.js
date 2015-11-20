@@ -206,7 +206,7 @@ describe('roles RESTful API tests', function() {
    */
   it('should update the specified user\'s role.', function(done) {
     request
-      .put('localhost:3000/api/users/role')
+      .put('localhost:3000/api/roles/user')
       .set('X-Access-Token', authToken)
       .send(newRole)
       .accept('application/json')
@@ -220,28 +220,4 @@ describe('roles RESTful API tests', function() {
         done();
       });
   });
-
-  /**
-   * Remove the specified resource from storage.
-   * DELETE /roles/{id}
-   *
-   * @param  int  $id
-   * @return Response
-   *
-  it('should remove the specified role from storage.', function(done) {
-    request
-      .del(resourceApiUrl + '/' + role.title)
-      .set('X-Access-Token', authToken)
-      .accept('application/json')
-      .end(function(err, res) {
-        if (res.ok) {
-          _expect(res.body.message).to.be.a('string');
-          _expect(res.body.message).to.match(/(deleted)/g);
-        } else {
-          throw err;
-        }
-        done();
-      });
-  });
-  */
 });

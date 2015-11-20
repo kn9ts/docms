@@ -6,13 +6,21 @@ var mongoose = require('../server/config/database'),
   Roles = require('../server/models/roles')(mongoose, Schema),
   roles = require('./roles.json');
 
-roles.forEach(function(role) {
-  var newRole = new Roles(role);
-  newRole.save(function(err) {
-    if (err) {
-      throw err;
-    }
-  });
-});
+function exit() {
+  setInterval(function() {
+    process.exit(0);
+  }, 500);
+}
 
-process.exit(0);
+for (var x = 0, len = roles.length; x <= len; x++) {
+  if (x < len) {
+    var newRole = new Roles(roles[x]);
+    newRole.save(function(err) {
+      if (err) {
+        throw err;
+      }
+    });
+  } else {
+    exit();
+  }
+}

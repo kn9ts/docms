@@ -8,6 +8,6 @@ module.exports = function(api, auth, roles) {
     .delete(auth, roles.delete);
 
   // update a user's role
-  api.route('/users/role')
+  api.route('/roles/user')
     .put(auth, roles.update);
 };

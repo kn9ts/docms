@@ -94,19 +94,18 @@ Roles.prototype = {
       Roles = req.app.get('models').Roles;
 
     // role title must be viewer, admin, user
-    if (!/(viewer|admin|user)/.test(req.body.title)) {
-      var err = new Error('Role should be either viewer, user or admin.');
+    if (req.body.title && !/(viewer|admin|user)/gi.test(req.body.title)) {
+      var err = new Error('Role should be defined and be either viewer, user or admin.');
       err.status = 403;
       return next(err);
     }
 
     // ensure the role exists
-    Roles.findOne({
-        title: req.body.title
-      })
+    Roles.findOne()
+      .where('title').equals(req.body.title)
       .exec(function(err, role) {
         if (err) {
-          err = new Error('Role exists.');
+          err = new Error('Oop! Database error while fetching roles');
           return next(err);
         }
 
@@ -127,6 +126,10 @@ Roles.prototype = {
                 });
               }
             });
+        } else {
+          err = new Error('The role ' + req.body.title + ' does not exists. Please create one before assign it to a user.');
+          err.status = 404;
+          return next(err);
         }
       });
   },
