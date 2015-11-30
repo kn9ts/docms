@@ -135,28 +135,35 @@ Roles.prototype = {
   },
   delete: function(req, res, next) {
     var Roles = req.app.get('models').Roles;
-    Roles.findOne({
-        title: req.params.title
-      })
-      .exec(function(err, role) {
-        if (err) {
-          err = new Error('Such a role does not exist.');
-          return next(err);
-        }
+    // Only an admin can delete a role
+    if (res.decoded.role.title === 'admin') {
+      Roles.findOne({
+          title: req.params.title
+        })
+        .exec(function(err, role) {
+          if (err) {
+            err = new Error('Such a role does not exist.');
+            return next(err);
+          }
 
-        if (role) {
-          role.remove(function(err) {
-            if (err) {
-              err = new Error('Failed to delete. Please try again.');
-              return next(err);
-            } else {
-              res.status(200).json({
-                message: 'Poof! And the role has been deleted.'
-              });
-            }
-          });
-        }
-      });
+          if (role) {
+            role.remove(function(err) {
+              if (err) {
+                err = new Error('Failed to delete. Please try again.');
+                return next(err);
+              } else {
+                res.status(200).json({
+                  message: 'Poof! And the role has been deleted.'
+                });
+              }
+            });
+          }
+        });
+    } else {
+      var err = new Error('Forbidden. Only admin can delete the roles');
+      err.status = 403;
+      return next(err);
+    }
   }
 };
 

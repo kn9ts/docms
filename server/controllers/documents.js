@@ -142,8 +142,8 @@ Documents.prototype = {
     });
   },
   delete: function(req, res, next) {
-    // a viewer is not allowed to create a document
-    if (req.decoded.role && req.decoded.role.title !== 'admin') {
+
+    if (req.decoded.role && /(user|admin)/g.test(req.decoded.role.title)) {
       var err = new Error('You are not authorized to delete documents.');
       err.status = 401;
       return next(err);
@@ -160,11 +160,12 @@ Documents.prototype = {
         // if the document exists
         if (doc) {
           // and the request came from the doc _creator
-          if (String(doc._creator._id) === String(req.decoded._id)) {
+          // or ADMIN
+          if (String(doc._creator._id) === String(req.decoded._id) || req.decoded.role.title === 'admin') {
             // delete it
             doc.remove(function(err) {
               if (err) {
-                err = new Error('Failed to delete. Please try again.');
+                err = new Error('Failed to delete. Only admin and document creator is allowed to delete document.');
                 return next(err);
               } else {
                 res.status(200).json({
@@ -174,7 +175,7 @@ Documents.prototype = {
             });
           } else {
             // 403 - Forbidden
-            err = new Error('Can not delete the document. You are not authorized.');
+            err = new Error('You are not authorized to delete document. You must be creator or admin.');
             err.status = 403;
             return next(err);
           }

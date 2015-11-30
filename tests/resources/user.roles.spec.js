@@ -17,52 +17,45 @@ if (_u.contains(models, 'Users')) {
   Users = require('../../server/models/users')(mongoose, Schema);
 }
 
-describe('doc RESTful API tests', function() {
-  var user = {
+describe('Testing user roles', function() {
+
+  var newUser = {
       username: (faker.internet.userName()).toLowerCase(),
       password: faker.internet.password(),
       email: faker.internet.email(),
       firstname: faker.name.firstName(),
       lastname: faker.name.lastName()
     },
+    userInfoUpdates = {
+      role: 'user',
+      email: faker.internet.email()
+    },
     newDoc = {
       content: faker.lorem.sentence(),
       private: false
     },
+    rtndUser,
     doc,
     authToken = null;
 
-  before('create user', function(done) {
-    // 1st encrypt the user's password and then add them to the DB
-    bcrypt.hash(user.password, 10, function(err, hashedPassword) {
-      if (err) {
-        throw err;
-      }
-      var newUser = new Users(user);
-      newUser.password = hashedPassword;
-      // save user
-      newUser.save(function(err) {
-        if (err) {
-          throw err;
-        }
-        done();
-      });
-    });
-  });
-
   /**
-   * Display a listing of the resource.
-   * GET /documents
+   * Store a newly created resource in storage.
+   * POST /users (sign up)
    *
    * @return Response
    */
-  it('should not return any documents. Let them know he/she is unauthorised', function(done) {
+  it('should create a new user.', function(done) {
     request
-      .get(resourceApiUrl)
+      .post('http://localhost:3000/api/users')
+      .send(newUser)
       .accept('application/json')
       .end(function(err, res) {
-        _expect(res.status).to.be(401);
-        _expect(res.body.error).to.a('string');
+        _expect(res.status).to.be(200);
+
+        var data = res.body.user;
+        _expect(data.username).to.be(newUser.username);
+        _expect(data._id).to.be.a('string');
+        user = data;
         done();
       });
   });
@@ -76,7 +69,7 @@ describe('doc RESTful API tests', function() {
   it('should login the user and return API authorisation token.', function(done) {
     request
       .post('http://localhost:3000/api/users/login')
-      .send(user)
+      .send(newUser)
       .accept('application/json')
       .end(function(err, res) {
         _expect(res.status).to.be(200);
@@ -90,6 +83,7 @@ describe('doc RESTful API tests', function() {
         _expect(data.token).to.be.a('string');
         _expect(data.token.length).to.be.greaterThan(100);
         authToken = data.token;
+        rtndUser = data;
         done();
       });
   });
@@ -125,7 +119,50 @@ describe('doc RESTful API tests', function() {
    *
    * @return Response
    */
-  it('should store a newly created resource in storage.', function(done) {
+  it('should NOT be able to create a new document(viewing users is restricted to create document).', function(done) {
+    request
+      .post(resourceApiUrl)
+      .set('X-Access-Token', authToken)
+      .send(newDoc)
+      .accept('application/json')
+      .end(function(err, res) {
+        _expect(res.status).to.be(401);
+        done();
+      });
+  });
+
+  /**
+   * Update the specified resource in storage.
+   * PUT /users/{id}
+   *
+   * @param  int  $id
+   * @return Response
+   */
+  it('should update the user\'s role.', function(done) {
+    request
+      .put('http://localhost:3000/api/users/' + rtndUser._id)
+      .set('X-Access-Token', authToken)
+      .send(userInfoUpdates)
+      .accept('application/json')
+      .end(function(err, res) {
+        _expect(res.status).to.be(200);
+
+        var data = res.body;
+        _expect(data.message).to.be.a('string');
+        _expect(data.message).to.match(/(updated)/);
+        authToken = data.user.token;
+        rtndUser = data.user;
+        done();
+      });
+  });
+
+  /**
+   * Store a newly created resource in storage.
+   * POST /documents
+   *
+   * @return Response
+   */
+  it('should be able to create a new document.', function(done) {
     request
       .post(resourceApiUrl)
       .set('X-Access-Token', authToken)
@@ -163,30 +200,6 @@ describe('doc RESTful API tests', function() {
   });
 
   /**
-   * Update the specified resource in storage.
-   * PUT /documents/{id}
-   *
-   * @param  int  $id
-   * @return Response
-   */
-  it('should update the specified resource in storage.', function(done) {
-    request
-      .put(resourceApiUrl + '/' + doc._id)
-      .set('X-Access-Token', authToken)
-      .send({
-        content: faker.lorem.sentence()
-      })
-      .accept('application/json')
-      .end(function(err, res) {
-        _expect(res.status).to.be(200);
-        _expect(res.body.document.content).to.be.a('string');
-        _expect(res.body.document.content).not.to.be(doc.content);
-        _expect(res.body.message).to.match(/(updated)/);
-        done();
-      });
-  });
-
-  /**
    * Remove the specified resource from storage.
    * DELETE /document/{id}
    *
@@ -206,82 +219,4 @@ describe('doc RESTful API tests', function() {
       });
   });
 
-  /**
-   * Logout the user
-   * GET /users/logout
-   *
-   * @return Response
-   */
-  it('should log out the user', function(done) {
-    request
-      .get('http://localhost:3000/api/users/logout')
-      .set('X-Access-Token', authToken)
-      .accept('application/json')
-      .end(function(err, res) {
-        _expect(res.status).to.be(200);
-        _expect(res.body.message).to.be.a('string');
-        authToken = null;
-        done();
-      });
-  });
-
-  /**
-   * Display the specified resource.
-   * GET /documents/{id}
-   *
-   * @param  int  $id
-   * @return Response
-   */
-  it('should NOT display the specified resource to unauthorised user', function(done) {
-    request
-      .get(resourceApiUrl + '/' + doc._id)
-      .set('X-Access-Token', authToken)
-      .accept('application/json')
-      .end(function(err, res) {
-        _expect(res.status).to.be(401);
-        _expect(res.body.error).to.a('string');
-        done();
-      });
-  });
-
-  /**
-   * Update the specified resource in storage.
-   * PUT /documents/{id}
-   *
-   * @param  int  $id
-   * @return Response
-   */
-  it('should NOT update the specified resource to unauthorised user.', function(done) {
-    request
-      .put(resourceApiUrl + '/' + doc._id)
-      .set('X-Access-Token', authToken)
-      .send({
-        content: faker.lorem.sentence()
-      })
-      .accept('application/json')
-      .end(function(err, res) {
-        _expect(res.status).to.be(401);
-        _expect(res.body.error).to.a('string');
-        done();
-      });
-  });
-
-  /**
-   * Remove the specified resource from storage.
-   * DELETE /documents/{id}
-   *
-   * @param  int  $id
-   * @return Response
-   */
-  it('should not remove the specified resource because user is unauthorised.', function(done) {
-    request
-      .del(resourceApiUrl + '/' + doc._id)
-      .set('X-Access-Token', authToken)
-      .accept('application/json')
-      .end(function(err, res) {
-        _expect(res.status).to.be(401);
-        _expect(res.body.error).to.a('string');
-        done();
-      });
-  });
 });

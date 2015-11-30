@@ -116,7 +116,6 @@ Users.prototype = {
       Roles = req.app.get('models').Roles;
 
     if (req.body.username && req.body.password && req.body.email && req.body.firstname && req.body.lastname) {
-
       Users.findOne()
         .or([{
           email: req.body.email
@@ -154,11 +153,12 @@ Users.prototype = {
               }
             };
 
+            // if a role was given, as a valid one, set it
             if (!req.body.hasOwnProperty('role')) {
               req.body.role = 'viewer';
             }
 
-            // if a role was given, as a valid one, set it
+            // If given, is it valid?
             if (!(/(viewer|admin|user)/gi.test(req.body.role))) {
               err = new Error('Role should be either viewer, user or admin.');
               err.status = 403;
@@ -204,19 +204,58 @@ Users.prototype = {
   },
   update: function(req, res, next) {
     var Users = req.app.get('models').Users;
-    Users.findByIdAndUpdate(req.params.id, req.body).exec(function(err, user) {
-      if (err) {
-        err = new Error('User does not exist.');
-        return next(err);
-      }
-      if (user) {
-        // show the updated content
-        res.status(200).json({
-          user: user,
-          message: 'User updated successfully.'
+
+    function updateUser() {
+      Users.findByIdAndUpdate(req.params.id, req.body).exec(function(err, user) {
+        if (err) {
+          err = new Error('User does not exist.');
+          return next(err);
+        }
+        if (user) {
+          // update his token
+          user.token = jwt.sign(user, req.app.get('superSecret'), {
+            expiresIn: 1440 * 60 // expires in 24 hours
+          });
+
+          user.save(function(err) {
+            if (err) {
+              err.details = '[server error] Failed to update token.';
+              return next(err);
+            } else {
+              user.password = undefined;
+              // show the updated content
+              res.status(200).json({
+                user: user,
+                message: 'User updated successfully.'
+              });
+            }
+          });
+        }
+      });
+    }
+
+    // if a role should be updated
+    if (req.body.hasOwnProperty('role')) {
+      var Roles = req.app.get('models').Roles;
+      Roles.findOne()
+        .where('title').equals(req.body.role)
+        .exec(function(err, role) {
+          if (err) {
+            var newErr = new Error('Such a role does not exist.');
+            newErr.error = err;
+            return next(newErr);
+          }
+
+          // role found
+          if (role) {
+            req.body.role = role._id;
+            // update the user
+            updateUser();
+          }
         });
-      }
-    });
+    } else {
+      updateUser();
+    }
   },
   delete: function(req, res, next) {
     var Users = req.app.get('models').Users;
