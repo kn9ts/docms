@@ -5,17 +5,7 @@ var request = require('superagent'),
   faker = require('faker'),
   _expect = require('expect.js'),
   resourceApiUrl = 'http://localhost:3000/api/documents',
-  _u = require('underscore'),
-  bcrypt = require('bcrypt'),
-  mongoose = require('../../server/config/database');
-
-var models = mongoose.modelNames();
-if (_u.contains(models, 'Users')) {
-  Users = mongoose.model('Users');
-} else {
-  var Schema = mongoose.Schema;
-  Users = require('../../server/models/users')(mongoose, Schema);
-}
+  _u = require('underscore');
 
 describe('Testing user roles', function() {
 
@@ -55,7 +45,7 @@ describe('Testing user roles', function() {
         var data = res.body.user;
         _expect(data.username).to.be(newUser.username);
         _expect(data._id).to.be.a('string');
-        user = data;
+        rtndUser = data;
         done();
       });
   });
@@ -76,7 +66,7 @@ describe('Testing user roles', function() {
 
         var data = res.body.user;
         _expect(res.body.message).to.be.a('string');
-        _expect(data.username).to.be(user.username);
+        _expect(data.username).to.be(newUser.username);
         _expect(data._id).to.be.a('string');
 
         // check if the token has been issued out
