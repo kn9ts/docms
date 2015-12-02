@@ -4,8 +4,7 @@ require('dotenv').load();
 var request = require('superagent'),
   faker = require('faker'),
   _expect = require('expect.js'),
-  resourceApiUrl = 'http://localhost:3000/api/documents',
-  _u = require('underscore');
+  resourceApiUrl = 'http://localhost:3000/api/documents';
 
 describe('Testing user roles', function() {
 
@@ -24,7 +23,7 @@ describe('Testing user roles', function() {
       content: faker.lorem.sentence(),
       private: false
     },
-    rtndUser,
+    user,
     doc,
     authToken = null;
 
@@ -45,7 +44,7 @@ describe('Testing user roles', function() {
         var data = res.body.user;
         _expect(data.username).to.be(newUser.username);
         _expect(data._id).to.be.a('string');
-        rtndUser = data;
+        user = data;
         done();
       });
   });
@@ -73,7 +72,7 @@ describe('Testing user roles', function() {
         _expect(data.token).to.be.a('string');
         _expect(data.token.length).to.be.greaterThan(100);
         authToken = data.token;
-        rtndUser = data;
+        user = data;
         done();
       });
   });
@@ -130,7 +129,7 @@ describe('Testing user roles', function() {
    */
   it('should update the user\'s role.', function(done) {
     request
-      .put('http://localhost:3000/api/users/' + rtndUser._id)
+      .put('http://localhost:3000/api/users/' + user._id)
       .set('X-Access-Token', authToken)
       .send(userInfoUpdates)
       .accept('application/json')
@@ -141,7 +140,7 @@ describe('Testing user roles', function() {
         _expect(data.message).to.be.a('string');
         _expect(data.message).to.match(/(updated)/);
         authToken = data.user.token;
-        rtndUser = data.user;
+        user = data.user;
         done();
       });
   });
