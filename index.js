@@ -92,8 +92,8 @@ app.use(function(err, req, res, next) {
 });
 
 var server = app.listen(process.env.PORT || 3000, function() {
-  var initVantage = require('./cli/commands');
-  initVantage(app);
+  console.log('Express server listening on %d, in %s' +
+    ' mode', server.address().port, app.get('env'));
 });
 
 //expose app
