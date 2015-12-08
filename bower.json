@@ -1,0 +1,19 @@
+{
+  "name": "docms",
+  "description": "document management system",
+  "main": "index.js",
+  "authors": [
+    "Eugene Mutai"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/kn9ts/docms",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
