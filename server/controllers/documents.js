@@ -112,9 +112,9 @@ Documents.prototype = {
       });
     } else {
       // 416 - Requested Range Not Satisfiable
-      var err = new Error('No content provided to create a document.');
-      err.status = 416;
-      return next(err);
+      var newErr = new Error('No content provided to create a document.');
+      newErr.status = 416;
+      return next(newErr);
     }
   },
   update: function(req, res, next) {
