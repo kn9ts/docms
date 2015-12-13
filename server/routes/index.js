@@ -7,7 +7,12 @@ module.exports = function(router) {
   require('./roles')(router, auth, controller.Roles);
   require('./documents')(router, auth, controller.Documents);
 
-  /* GET the API status */
-  router.all('/', auth, controller.App.status);
+  /* Load up the homepage */
+  router.all('/', function(req, res) {
+    res.sendFile('index.html', {
+      root: './public/'
+    });
+  });
+
   return router;
 };

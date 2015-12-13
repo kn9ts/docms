@@ -1,0 +1,23 @@
+include ../includes/header
+
+.index(layout="row" ng-cloak layout-align="center center")
+  // Spacing purposes
+  span(flex)
+
+  div(layout="column" flex="40" flex-sm="90" flex-md="60")
+    md-content.border-round(flex layout-align="center center" layout-wrap class="auto-scroll")
+      md-card.border-round(flex)
+        div(layout-padding )
+          .container(md-block flex layout="row")
+            div(flex=10)
+              i.material-icons.md-24.icon-padding-top insert_drive_file
+            div(flex=90)
+              md-input-container(md-block)
+                label Update the content of your document
+                textarea(ng-model="document.content" columns="1" md-maxlength="150" rows="5")
+
+          .container(md-block flex layout="row")
+            md-button(flex).md-accent.md-raised.md-hue-2 Create Document
+
+  // Spacing purposes
+  span(flex)

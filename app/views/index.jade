@@ -1,0 +1,16 @@
+.index(layout="row" ng-cloak layout-align="center center")
+  // spacing
+  span(flex)
+
+  // form centralised
+  div(layout="column" flex=30 flex-sm=90 flex-md=60)
+    md-content.border-round(flex layout-align="center center" layout-wrap class="auto-scroll")
+      md-tabs.white-bg.border-round(md-dynamic-height md-border-bottom)
+        md-tab(label="Log in")
+          include.template(ui-view="login")
+
+        md-tab(label="Create account")
+          include.template(ui-view="createAccount")
+
+  // spacing
+  span(flex)

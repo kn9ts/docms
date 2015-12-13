@@ -1,0 +1,41 @@
+include ../includes/header
+
+.dashboard(layout="row" layout-align="center end")
+  // Spacing purposes
+  span(flex)
+
+  div.padding-top(layout="column" flex="50" flex-sm="90" flex-md="60")
+    //- md-content.border-round(flex layout-align="center center" layout-wrap class="auto-scroll")
+    md-tabs.white-bg.border-round(md-dynamic-height md-border-bottom)
+      md-tab(flex="column" label="All documents")
+        md-card(flex layout layout-padding)
+          md-card-content
+            h4.bold.no-padding.no-margin Eugene Mutai
+            p ad exercitation Lorem proident eiusmod culpa quis aliqua cillum tempor commodo deserunt pariatur ullamco dolore ipsum id et ipsum incididunt esse minim proident
+          div(layout layout-align="end center" flex)
+              // Deleting
+              md-button(ui-sref="document").md-fab.md-mini.md-delete
+                i.white.material-icons.md-24.mini-padding delete
+              // Updating button
+              md-button(ui-sref="document").md-fab.md-mini.md-update
+                i.white.material-icons.md-24.mini-padding create
+
+      md-tab(label="My docs")
+        md-card(flex layout layout-padding)
+          md-card-content
+              h4.bold.no-padding.no-margin Eugene Mutai
+              p ad exercitation Lorem proident eiusmod culpa quis aliqua cillum tempor commodo deserunt pariatur ullamco dolore ipsum id et ipsum incididunt esse minim proident
+            div(layout layout-align="end center" flex)
+                // Deleting
+                md-button.md-fab.md-mini.md-delete
+                  i.white.material-icons.md-24.mini-padding delete
+                // Updating button
+                md-button.md-fab.md-mini.md-update
+                  i.white.material-icons.md-24.mini-padding create
+
+  // Spacing purposes
+  span(flex layout="column" layout-align="start end" layout-padding)
+    .document(flex)
+      md-button(ui-sref="document").md-fab.md-accent.md-hue-2.md-whiteframe-18dp
+        i.white.material-icons.md-36.mini-padding insert_drive_file
+

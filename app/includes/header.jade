@@ -1,0 +1,25 @@
+.dashboard.header-spacing(flex layout="row" ng-controller="headerController")
+  md-toolbar.md-accent.md-hue-2.md-whiteframe-12dp(layout="row")
+    .md-toolbar-tools
+      //- ui-sref-opts="{inherit: true, notify: true}"
+      a(ui-sref="dashboard({id: user.username})")
+        //- i.material-icons.md-16.padding-xs.white folder_shared
+        | &nbsp;Documents Management System
+
+      span(flex=5)
+      div(flex hide-sm hide-md layout)
+        .container(md-block flex layout="row")
+          div(flex=10 style="margin-top: 0.7em")
+            i.material-icons.md-36.mini-padding.bold search
+          div(flex=90)
+            md-input-container(md-block)
+              label Search for a document
+              input(type=text ng-model=user)
+
+      span(flex)
+      div(flex=10 flex-sm=25 layout)
+        a(flex ui-sref="account({id: user.username})").md-accent.md-icon-button
+          i.white.material-icons.md-36.padding-xs face
+
+        a(flex ng-click="logoutUser()").md-accent.md-icon-button
+          i.white.material-icons.md-36.padding-xs exit_to_app

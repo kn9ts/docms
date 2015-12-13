@@ -1,0 +1,12 @@
+include ../includes/header
+
+.index(layout="row" ng-cloak layout-align="center center")
+  // Spacing purposes
+  span(flex)
+
+  div(layout="column" flex="30" flex-sm="90" flex-md="60")
+    md-content.border-round(flex layout-align="center center" layout-wrap class="auto-scroll")
+      include partials/profile
+
+  // Spacing purposes
+  span(flex)

@@ -1,30 +1,28 @@
-'use strict';
 module.exports = function(api, auth, users) {
-  // Login route
+  'use strict';
+  // authentication routes
   api.route('/users/login')
     .post(users.login);
-
-  api.route('/users/logout')
-    .get(auth, users.logout);
 
   api.route('/users/session')
     .get(auth, users.session);
 
+  api.route('/users/logout')
+    .get(auth, users.logout);
+
   api.route('/users')
-    // Get all users
+    // get all users
     .get(auth, users.all)
-    // Create a new user/sign up
+    // create a new user/sign up
     .post(users.create);
 
-  // Get, Update or Delete a specific user
+  // get, update or delete a specific user
   api.route('/users/:id')
-    // Get the user's details
-    .get(auth, users.find)
-    // Update the user's details
+    .get(users.find)
     .put(auth, users.update)
-    // Delete the user
     .delete(auth, users.delete);
 
+  // get all the documents created by the user
   api.route('/users/:id/documents')
     .get(auth, users.documents);
 };

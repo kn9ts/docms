@@ -1,0 +1,27 @@
+title Document Management System
+
+base(href="/")
+// Site necessary meta tags
+meta(charset='utf-8')
+meta(name='viewport', content='width=device-width, initial-scale=1')
+meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
+meta(name='description', content='')
+meta(name='keywords', content='')
+meta(http-equiv='cleartype', content='on')
+
+//- Favicons
+//- Place favicon.ico and apple-touch-icon.png in the root directory
+//- link(rel="shortcut icon" type="image/png" href="")
+//- link(rel="shortcut icon" type="image/x-icon" href="")
+
+link(rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,500,700,400italic")
+//- link(rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons")
+link(rel="stylesheet" href="./lib/angular-material/angular-material.min.css")
+style(type="text/css").
+  /* Hide when Angular is not yet loaded and initialized */
+  [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+  }
+
+// Your stylesheets
+link(rel='stylesheet', href='css/application.css')

@@ -51,12 +51,12 @@ app.use(session({
 
 // CORS Support in my Node.js web app written with Express
 // http://stackoverflow.com/questions/7067966/how-to-allow-cors-in-express-nodejs
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD');
-  next();
-});
+// app.use(function(req, res, next) {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-Access-Token");
+//   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD');
+//   next();
+// });
 
 // handle OPTIONS requests from the browser
 app.options("*", function(req, res) {
@@ -66,8 +66,8 @@ app.options("*", function(req, res) {
 });
 
 // get an instance of the router for api routes
-var apiRouter = express.Router();
-app.use('/api', routes(apiRouter, config));
+var api = express.Router();
+app.use('/api', routes(api));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

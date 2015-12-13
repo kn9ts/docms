@@ -1,0 +1,52 @@
+md-card.border-round(flex layout-padding)
+  form(name="account" ng-submit="createAccount()" novalidate)
+    .container(md-block flex layout="row")
+      div(flex=10)
+        i.material-icons.md-24.icon-padding-top account_box
+      div(flex=90)
+        md-input-container(md-block)
+          label Username
+          input(type="text" ng-model="user.username")
+
+    .container(md-block flex layout="row")
+      div(flex=10)
+        i.material-icons.md-24.icon-padding-top face
+      div(flex=90)
+        md-input-container(md-block)
+          label First Name
+          input(type="text" ng-model="user.name.first")
+
+    .container(md-block flex layout="row")
+      div(flex=10)
+        i.material-icons.md-24.icon-padding-top face
+      div(flex=90)
+        md-input-container(md-block)
+          label Last Name
+          input(type="text" ng-model="user.name.last")
+
+    .container(md-block flex layout="row")
+      div(flex=10)
+        i.material-icons.md-24.icon-padding-top email
+      div(flex=90)
+        md-input-container(md-block)
+          label Email Address
+          input(type="text" ng-model="user.email")
+
+    .container(ng-show="user.password" md-block flex layout="row")
+      div(flex=10)
+        i.material-icons.md-24.icon-padding-top lock
+      div(flex=90)
+        md-input-container(md-block)
+          label Password
+          input(type="text" ng-model="user.password")
+
+    .container(ng-show="user.password" flex layout="row")
+      div(flex=10)
+        i.material-icons.md-24.icon-padding-top lock
+      div(flex=90)
+        md-input-container(md-block)
+          label Confirm Password
+          input(type="text" ng-model="user.passwordConfirm")
+
+    .container(md-block flex layout="row")
+      button(flex type="submit").md-button.md-accent.md-raised.md-hue-2 Create Account
