@@ -1,4 +1,7 @@
-/public
+# This repo
+tmp/
+public/
+.editorconfig
 
 # Created by https://www.gitignore.io/api/node,laravel,bower,justcode,linux,osx,jetbrains,sublimetext,vim,xcode
 
