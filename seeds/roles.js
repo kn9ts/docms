@@ -4,13 +4,8 @@ require('dotenv').load();
 var mongoose = require('../server/config/database'),
   Schema = mongoose.Schema,
   Roles = require('../server/models/roles')(mongoose, Schema),
-  roles = require('./roles.json');
-
-function exit() {
-  setInterval(function() {
-    process.exit(0);
-  }, 500);
-}
+  roles = require('./roles.json'),
+  exit = require('./exit');
 
 for (var x = 0, len = roles.length; x <= len; x++) {
   if (x < len) {
