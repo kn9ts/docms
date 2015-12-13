@@ -1,6 +1,7 @@
 'use strict';
 var bcrypt = require('bcrypt'),
   jwt = require('jsonwebtoken'),
+  _u = require('underscore'),
   Users = function() {};
 
 Users.prototype = {
@@ -27,9 +28,11 @@ Users.prototype = {
                 // is the password validly equal to its encrypted version
                 if (areMatching) {
                   user.token = undefined;
+                  var makeTokenFromTheseUserDetailsOnly = _u.pick(user, '_id', 'username', 'name', 'email', 'role', 'dateCreated');
+
                   // if user is found and password is right
                   // create a token
-                  user.token = jwt.sign(user, req.app.get('superSecret'), {
+                  user.token = jwt.sign(makeTokenFromTheseUserDetailsOnly, req.app.get('superSecret'), {
                     expiresIn: 1440 * 60 // expires in 24 hours
                   });
 
@@ -39,6 +42,7 @@ Users.prototype = {
                       return next(err);
                     } else {
                       user.password = undefined;
+                      req.session.user = user;
                       res.status(200).json({
                         user: user,
                         message: 'Successfully logged in.'
@@ -80,6 +84,13 @@ Users.prototype = {
           message: 'User has been logged out'
         });
       });
+    });
+  },
+  session: function(req, res) {
+    req.decoded.token = req.headers['x-access-token'];
+    return res.json({
+      user: req.decoded,
+      message: 'You are logged in as ' + req.decoded.username
     });
   },
   all: function(req, res, next) {
@@ -169,14 +180,14 @@ Users.prototype = {
               .where('title').equals(req.body.role)
               .exec(function(err, role) {
                 if (err) {
-                  var newErr = new Error('Such a role does not exist.');
+                  var newErr = new Error('Such a role does not exist: ' + req.body.role);
                   newErr.error = err;
                   return next(newErr);
                 }
-                // is the document public?
+
                 if (role) {
                   userDetails.role = role._id;
-                  // Finally create the user
+                  // create the user
                   var newUser = new Users(userDetails);
                   newUser.save(function(err) {
                     if (!err) {
@@ -211,24 +222,28 @@ Users.prototype = {
           err = new Error('User does not exist.');
           return next(err);
         }
+
         if (user) {
+          user.token = undefined;
           // update his token
-          user.token = jwt.sign(user, req.app.get('superSecret'), {
+          var makeTokenFromTheseUserDetailsOnly = _u.pick(user, '_id', 'username', 'name', 'email', 'role', 'dateCreated');
+          user.token = jwt.sign(makeTokenFromTheseUserDetailsOnly, req.app.get('superSecret'), {
             expiresIn: 1440 * 60 // expires in 24 hours
           });
+          console.log("UPDATED USER", user);
 
           user.save(function(err) {
             if (err) {
               err.details = '[server error] Failed to update token.';
               return next(err);
-            } else {
-              user.password = undefined;
-              // show the updated content
-              res.status(200).json({
-                user: user,
-                message: 'User updated successfully.'
-              });
             }
+
+            user.password = undefined;
+            // show the updated content
+            res.status(200).json({
+              user: user,
+              message: 'User updated successfully.'
+            });
           });
         }
       });
@@ -280,12 +295,6 @@ Users.prototype = {
           message: 'Huh! We did not have to do anything. User does not exist.'
         });
       }
-    });
-  },
-  session: function(req, res) {
-    return res.json({
-      user: req.decoded,
-      message: 'You are logged in as ' + req.decoded.username
     });
   },
   documents: function(req, res, next) {
