@@ -22,6 +22,7 @@ describe('doc RESTful API tests', function() {
       username: (faker.internet.userName()).toLowerCase(),
       password: faker.internet.password(),
       email: faker.internet.email(),
+      // role: 'viewer', // default
       firstname: faker.name.firstName(),
       lastname: faker.name.lastName()
     },

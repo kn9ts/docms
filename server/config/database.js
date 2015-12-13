@@ -1,10 +1,9 @@
-'use strict';
 var Mongoose = require('mongoose');
 Mongoose.connect(process.env.DATABASE);
 
 // When successfully connected
 Mongoose.connection.on('connected', function() {
-  // console.log('Mongoose has connected to the database specified.');
+  console.log('Mongoose has connected to the database specified.');
 });
 
 // If the connection throws an error
