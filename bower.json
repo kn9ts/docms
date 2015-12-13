@@ -3,7 +3,7 @@
   "description": "document management system",
   "main": "index.js",
   "authors": [
-    "Eugene Mutai"
+    "Eugene Mutai <eugenemutai@gmail.com>"
   ],
   "license": "MIT",
   "homepage": "https://github.com/kn9ts/docms",
@@ -14,6 +14,19 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
-  ]
+    "tests",
+    "public/lib"
+  ],
+  "dependencies": {
+    "angular": "angularjs#~1.4.7",
+    "angular-ui-router": "~0.2.15",
+    "angular-animate": "~1.4.7",
+    "angular-resource": "~1.4.7",
+    "angular-mocks": "~1.4.7",
+    "angular-material": "~0.11.4",
+    "material-design-icons": "~2.1.1",
+    "Materialize": "materialize#~0.97.3",
+    "jquery": "~2.1.4",
+    "angular-cookies": "~1.4.8"
+  }
 }
