@@ -4,11 +4,11 @@ module.exports = {
     '': {
       templateUrl: 'views/index.html'
     },
-    'login@home': {
+    'login@entrance': {
       templateUrl: 'views/partials/login.html',
       controller: 'loginController'
     },
-    'createAccount@home': {
+    'createAccount@entrance': {
       templateUrl: 'views/partials/profile.html',
       controller: 'createAccountController'
     }

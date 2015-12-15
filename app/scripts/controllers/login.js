@@ -3,27 +3,19 @@ var loginController = function($rootScope, $scope, $state, $cookies, User) {
     username: 'eugene',
     password: 'password'
   };
+  // {username: 'christa_ullrich', password: 'password1'};
 
-  var user = $cookies.getObject('docmsToken');
-  if (user) {
-    console.log('COOKIE', user.username);
-    $rootScope.user = User.$data = user;
-    $state.go('dashboard', {
-      id: user.username
-    });
-  }
-
-  $scope.login = function(savedUser) {
+  $scope.loginUser = function() {
     // login user
-    User.login(savedUser || $scope.user, function(err, user) {
+    User.login($scope.user, function(err, user) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+
       console.log('LOGGEDIN_USER', user);
-
-      // console.log('Instance of User', Object.getOwnPropertyNames(user).map(function(p) {
-      //   return [p, typeof user[p]].join(': ');
-      // }));
-
-      user.name.last = 'Mutai';
-      user.$update();
+      // user.name.last = 'Mutai';
+      // user.$update();
 
       $state.go('dashboard', {
         id: user.username

@@ -21,16 +21,3 @@ appFilters.filter('timeago', function() {
     return format ? moment(input, "YYYY-MM-DD HH:mm").format('LL') : moment(input, "YYYY-MM-DD HH:mm").fromNow();
   };
 });
-
-appFilters.filter('summary', function() {
-  return function(input, len) {
-    return input.substring(-1, parseInt(len)) + '...';
-  };
-});
-
-appFilters.filter('util', function() {
-  return function(input, format) {
-    // If format ==  true, then format the no. provided
-    return format ? Util.formatNumber(input) : Util.padPrice(input);
-  };
-});

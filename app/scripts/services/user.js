@@ -6,10 +6,6 @@ var user = function($resource, $http) {
     update: {
       // this method issues a PUT request
       method: 'PUT'
-    },
-    save: {
-      // this method issues a PUT request
-      method: 'PUT'
     }
   }, {
     stripTrailingSlashes: false

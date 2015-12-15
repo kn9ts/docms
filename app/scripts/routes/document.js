@@ -1,9 +1,9 @@
 module.exports = {
-  url: '/document/edit',
+  url: '/document/{id}/edit',
   views: {
     '': {
       templateUrl: 'views/document.html',
-      controller: 'appController'
+      controller: 'documentController'
     }
   }
 };

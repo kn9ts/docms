@@ -5,7 +5,7 @@ module.exports = function($stateProvider, $urlRouterProvider, $locationProvider)
   $urlRouterProvider.otherwise('/');
 
   Route
-    .state('home', require('./routes/index'))
+    .state('entrance', require('./routes/index'))
     .state('dashboard', require('./routes/dashboard'))
     .state('account', require('./routes/account'))
     .state('document', require('./routes/document'));
