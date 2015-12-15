@@ -5,7 +5,7 @@ module.exports = function(api, auth, users) {
     .post(users.login);
 
   api.route('/users/session')
-    .get(auth, users.session);
+    .get(users.session);
 
   api.route('/users/logout')
     .get(auth, users.logout);

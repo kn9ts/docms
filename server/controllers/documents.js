@@ -21,6 +21,9 @@ Documents.prototype = {
     // Get public and documents user created
     Documents.find(scope)
       .populate('_creator', '_id username name')
+      .sort({
+        dateCreated: -1
+      })
       .exec(function(err, docs) {
         if (err) {
           return next(err);
@@ -143,9 +146,11 @@ Documents.prototype = {
   },
   delete: function(req, res, next) {
 
-    if (req.decoded.role && /(user|admin)/g.test(req.decoded.role.title)) {
+    // Only users(their own documents) and admins are allowed to delete documents
+    if (req.decoded.role && !/(user|admin)/g.test(req.decoded.role.title)) {
       var err = new Error('You are not authorized to delete documents.');
       err.status = 401;
+      err.role = req.decoded.role;
       return next(err);
     }
 
@@ -200,6 +205,9 @@ Documents.prototype = {
           content: {
             $regex: new RegExp(req.params.term)
           }
+        })
+        .sort({
+          dateCreated: -1
         })
         .populate('_creator', '_id username name')
         .exec(function results(err, documentsFound) {

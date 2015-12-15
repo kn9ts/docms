@@ -27,7 +27,6 @@ Users.prototype = {
                 }
                 // is the password validly equal to its encrypted version
                 if (areMatching) {
-                  user.token = undefined;
                   var makeTokenFromTheseUserDetailsOnly = _u.pick(user, '_id', 'username', 'name', 'email', 'role', 'dateCreated');
 
                   // if user is found and password is right
@@ -41,7 +40,8 @@ Users.prototype = {
                       err.details = '[server error] Failed to save token.';
                       return next(err);
                     } else {
-                      user.password = undefined;
+                      delete user.password;
+                      // set session before sending out response
                       req.session.user = user;
                       res.status(200).json({
                         user: user,
@@ -80,18 +80,27 @@ Users.prototype = {
         if (err) {
           return next(err);
         }
-        res.status(200).json({
-          message: 'User has been logged out'
+
+        req.session.destroy(function(err) {
+          // cannot access session here
+          res.status(200).json({
+            message: 'User has been logged out'
+          });
         });
       });
     });
   },
-  session: function(req, res) {
-    req.decoded.token = req.headers['x-access-token'];
-    return res.json({
-      user: req.decoded,
-      message: 'You are logged in as ' + req.decoded.username
-    });
+  session: function(req, res, next) {
+    // req.decoded.token = req.headers['x-access-token'];
+    if (req.session.hasOwnProperty('user')) {
+      return res.json({
+        user: req.session.user,
+        message: 'You are logged in as ' + req.session.user.username
+      });
+    } else {
+      var err = new Error('No user is logged in.');
+      return next(err);
+    }
   },
   all: function(req, res, next) {
     var Users = req.app.get('models').Users;
@@ -114,13 +123,15 @@ Users.prototype = {
   find: function(req, res, next) {
     var Users = req.app.get('models').Users;
     Users.findOne({
-      _id: req.params.id
-    }, function(err, user) {
-      if (err) {
-        return next(err);
-      }
-      res.status(200).json(user);
-    });
+        _id: req.params.id
+      })
+      .populate('role')
+      .exec(function(err, user) {
+        if (err) {
+          return next(err);
+        }
+        res.status(200).json(user);
+      });
   },
   create: function(req, res, next) {
     var Users = req.app.get('models').Users,
@@ -216,7 +227,7 @@ Users.prototype = {
   update: function(req, res, next) {
     var Users = req.app.get('models').Users;
 
-    function updateUser() {
+    function updateUser(role) {
       Users.findByIdAndUpdate(req.params.id, req.body).exec(function(err, user) {
         if (err) {
           err = new Error('User does not exist.');
@@ -224,13 +235,12 @@ Users.prototype = {
         }
 
         if (user) {
-          user.token = undefined;
+          user.role = role;
           // update his token
           var makeTokenFromTheseUserDetailsOnly = _u.pick(user, '_id', 'username', 'name', 'email', 'role', 'dateCreated');
           user.token = jwt.sign(makeTokenFromTheseUserDetailsOnly, req.app.get('superSecret'), {
             expiresIn: 1440 * 60 // expires in 24 hours
           });
-          console.log("UPDATED USER", user);
 
           user.save(function(err) {
             if (err) {
@@ -238,7 +248,8 @@ Users.prototype = {
               return next(err);
             }
 
-            user.password = undefined;
+            delete user.password;
+            req.session.user = user;
             // show the updated content
             res.status(200).json({
               user: user,
@@ -265,7 +276,7 @@ Users.prototype = {
           if (role) {
             req.body.role = role._id;
             // update the user
-            updateUser();
+            updateUser(role);
           }
         });
     } else {
@@ -300,6 +311,9 @@ Users.prototype = {
   documents: function(req, res, next) {
     var Users = req.app.get('models').Users;
     Users.findById(req.params.id)
+      .sort({
+        dateCreated: -1
+      })
       .populate('docsCreated')
       .exec(function(err, user) {
         if (err) {

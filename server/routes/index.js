@@ -8,7 +8,7 @@ module.exports = function(router) {
   require('./documents')(router, auth, controller.Documents);
 
   /* Load up the homepage */
-  router.all('/', function(req, res) {
+  router.get('*', function(req, res) {
     res.sendFile('index.html', {
       root: './public/'
     });
