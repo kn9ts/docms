@@ -1,12 +1,16 @@
-md-card.border-round(flex layout-padding)
-  form(name="account" ng-submit="createAccount()" novalidate)
+md-card.border-round(flex layout="column" layout-padding)
+  form(name="account" ng-submit="createOrUpdateAccount()" novalidate)
     .container(md-block flex layout="row")
       div(flex=10)
         i.material-icons.md-24.icon-padding-top account_box
       div(flex=90)
         md-input-container(md-block)
           label Username
-          input(type="text" ng-model="user.username")
+          input(type="text" name="username" ng-required="true" ng-minlength="6" ng-pattern="/^([a-zA-Z])[a-zA-Z0-9._]+$/" ng-model="user.username")
+        div(flex layout="column" md-block)
+          span.error(flex ng-show="account.username.$dirty && account.username.$error.required") Please provide your account's username
+          span.error(flex ng-show="account.username.$dirty && account.username.$invalid") Please provide a valid username
+          span.error(flex ng-show="account.username.$dirty && account.username.$error.minlength") Password must be of 6 characters or more
 
     .container(md-block flex layout="row")
       div(flex=10)
@@ -14,7 +18,9 @@ md-card.border-round(flex layout-padding)
       div(flex=90)
         md-input-container(md-block)
           label First Name
-          input(type="text" ng-model="user.name.first")
+          input(type="text" name="firstname" ng-required="true" ng-pattern="/^([a-zA-Z])[a-zA-Z\-]+$/" ng-model="user.name.first")
+        div(flex layout="column" md-block)
+          span.error(flex ng-show="account.firstname.$dirty && account.firstname.$invalid") Please provide a valid first name
 
     .container(md-block flex layout="row")
       div(flex=10)
@@ -22,7 +28,9 @@ md-card.border-round(flex layout-padding)
       div(flex=90)
         md-input-container(md-block)
           label Last Name
-          input(type="text" ng-model="user.name.last")
+          input(type="text" name="lastname" ng-required="true" ng-pattern="/^([a-zA-Z])[a-zA-Z\-]+$/" ng-model="user.name.last")
+        div(flex layout="column" md-block)
+          span.error(flex ng-show="account.lastname.$dirty && account.lastname.$invalid") Please provide a valid last name
 
     .container(md-block flex layout="row")
       div(flex=10)
@@ -30,23 +38,45 @@ md-card.border-round(flex layout-padding)
       div(flex=90)
         md-input-container(md-block)
           label Email Address
-          input(type="text" ng-model="user.email")
+          input(type="text" name="email" ng-required="true" ng-pattern="/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/" ng-model="user.email")
+        div(flex layout="column" md-block)
+          span.error(flex ng-show="account.email.$dirty && account.email.$invalid") Please provide a valid email address
+          span.error(flex ng-show="account.email.$dirty && account.email.$error.required") Please provide an email address
 
-    .container(ng-show="user.password" md-block flex layout="row")
+    .container(md-block flex layout="row")
+      div(flex=10)
+        i.material-icons.md-24.icon-padding-top accessibility
+      div(flex=90)
+        md-input-container(md-block)
+          label Select Role
+          md-select(ng-model="user.role" required)
+            md-option(ng-repeat="role in roles" ng-value="role.title" ng-selected="role.title == user.role") {{ role.title }}
+        div(flex layout="column" md-block)
+          span.error(flex ng-show="account.email.$dirty && account.email.$error.required") Please select a role
+
+    // On sign up, no user is persisted, thus how these password fields
+    .container(ng-if="!isUpdate" md-block flex layout="row")
       div(flex=10)
         i.material-icons.md-24.icon-padding-top lock
       div(flex=90)
         md-input-container(md-block)
           label Password
-          input(type="text" ng-model="user.password")
+          input(type="password" name="password" ng-required="true" ng-minlength="6" ng-model="user.password")
+        div(flex layout="column" md-block)
+          span.error(flex ng-show="account.password.$dirty && account.password.$invalid") Please provide a valid secure password
+          span.error(flex ng-show="account.password.$dirty && account.password.$error.minlength") Password must be of 6 characters or more
 
-    .container(ng-show="user.password" flex layout="row")
+    .container(ng-if="!isUpdate" flex layout="row")
       div(flex=10)
         i.material-icons.md-24.icon-padding-top lock
       div(flex=90)
         md-input-container(md-block)
           label Confirm Password
-          input(type="text" ng-model="user.passwordConfirm")
+          input(type="password" name="confirmPassword" ng-required="true" ng-minlength="6" ng-model="user.passwordConfirm")
+        div(flex layout="column" md-block)
+          span.error(flex ng-show="account.confirmPassword.$dirty && account.confirmPassword.$invalid") Please confirm the password
+          span.error(flex ng-show="account.confirmPassword.$dirty && account.password.$dirty && (account.confirmPassword.$modelValue !== account.password.$modelValue)") Confirmation password does not match your password above
+          span.error(flex ng-show="account.confirmPassword.$dirty && account.confirmPassword.$error.minlength") Password must be of 6 characters or more
 
     .container(md-block flex layout="row")
-      button(flex type="submit").md-button.md-accent.md-raised.md-hue-2 Create Account
+      button(flex type="submit" ng-disabled="account.$invalid || (account.confirmPassword.$modelValue !== account.password.$modelValue) || buttonTitle == 'Account Details Updated!'" ng-class="{'md-accent': account.$valid, 'md-warn': account.$invalid}").md-button.md-raised.md-hue-2 {{ buttonTitle }}

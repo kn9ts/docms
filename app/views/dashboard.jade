@@ -7,35 +7,56 @@ include ../includes/header
   div.padding-top(layout="column" flex="50" flex-sm="90" flex-md="60")
     //- md-content.border-round(flex layout-align="center center" layout-wrap class="auto-scroll")
     md-tabs.white-bg.border-round(md-dynamic-height md-border-bottom)
-      md-tab(flex="column" label="All documents")
-        md-card(flex layout layout-padding)
-          md-card-content
-            h4.bold.no-padding.no-margin Eugene Mutai
-            p ad exercitation Lorem proident eiusmod culpa quis aliqua cillum tempor commodo deserunt pariatur ullamco dolore ipsum id et ipsum incididunt esse minim proident
-          div(layout layout-align="end center" flex)
-              // Deleting
-              md-button(ui-sref="document").md-fab.md-mini.md-delete
-                i.white.material-icons.md-24.mini-padding delete
+      md-tab(flex="column" label="All Docs")
+        md-card(flex layout layout-padding ng-repeat="doc in documents track by $index" data-id="{{ doc._id }}")
+          md-card-content(flex)
+            p {{ doc.content }}
+            p.bold.no-padding.no-margin {{ doc._creator.name.first | capitalize }}
+            span.small {{ doc.dateCreated | timeago }}
+          div(layout layout-sm="column" layout-md="column" layout-align="end center" flex=25 ng-show="doc._creator._id === user._id || user.role == 'admin'")
               // Updating button
-              md-button(ui-sref="document").md-fab.md-mini.md-update
-                i.white.material-icons.md-24.mini-padding create
+              md-button(ui-sref="document({id: doc._id})").md-fab.md-mini.md-update
+                i.white.material-icons.md-24.mini-padding edit
+
+              // Deleting
+              md-button(ng-click="deleteDocument(doc)").md-fab.md-mini.md-delete
+                i.white.material-icons.md-24.mini-padding delete
+
+         // if no documents have been created yet
+        md-card(ng-show="documents.length == 0" flex layout layout-padding)
+          md-card-content(flex layout-padding layout-aligh="center center")
+            h1.grey No documents have been created
+            // Deleting
+            md-button(ui-sref="document({id: 'new'})").md-delete.bold
+              | Create document
 
       md-tab(label="My docs")
-        md-card(flex layout layout-padding)
-          md-card-content
-              h4.bold.no-padding.no-margin Eugene Mutai
-              p ad exercitation Lorem proident eiusmod culpa quis aliqua cillum tempor commodo deserunt pariatur ullamco dolore ipsum id et ipsum incididunt esse minim proident
-            div(layout layout-align="end center" flex)
-                // Deleting
-                md-button.md-fab.md-mini.md-delete
-                  i.white.material-icons.md-24.mini-padding delete
-                // Updating button
-                md-button.md-fab.md-mini.md-update
-                  i.white.material-icons.md-24.mini-padding create
+        md-card(flex layout layout-padding ng-repeat="doc in myDocuments track by $index" data-id="{{ doc._id }}")
+          md-card-content(flex)
+            p {{ doc.content }}
+            //- p.bold.no-padding.no-margin {{ user.username | capitalize }}
+            span.small {{ doc.dateCreated | timeago }}
+          div(layout layout-align="end center" flex=25)
+              // Updating button
+              md-button(ui-sref="document({id: doc._id})").md-fab.md-mini.md-update
+                i.white.material-icons.md-24.mini-padding edit
+
+              // Deleting
+              md-button(ng-click="deleteDocument(doc)").md-fab.md-mini.md-delete
+                i.white.material-icons.md-24.mini-padding delete
+
+        // if the user has not created any documents yet
+        md-card(ng-show="myDocuments.length == 0" flex layout layout-padding)
+          md-card-content(flex layout-padding layout-aligh="center center")
+            h1.grey You have not created any documents.
+            // Deleting
+            md-button(ui-sref="document({id: 'new'})").md-delete.bold
+              | Create document
+
 
   // Spacing purposes
   span(flex layout="column" layout-align="start end" layout-padding)
     .document(flex)
-      md-button(ui-sref="document").md-fab.md-accent.md-hue-2.md-whiteframe-18dp
+      md-button(ui-sref="document({id: 'new'})").md-fab.md-accent.md-hue-2.md-whiteframe-18dp
         i.white.material-icons.md-36.mini-padding insert_drive_file
 

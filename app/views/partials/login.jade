@@ -1,14 +1,17 @@
 md-card.border-round(flex layout-padding)
-  form(name="loginForm" ng-submit="login()" novalidate)
+  form(name="login" ng-submit="loginUser()" novalidate)
     .container(md-block flex layout="row")
       div(flex=10)
         i.material-icons.md-24.icon-padding-top account_box
       div(flex=90 layout="column")
         md-input-container(md-block)
           label Username
-          input(type="text" name="username" ng-model="user.username" ng-required="true" ng-minlength="4" ng-pattern="/^[\w_.]+/" ng-model-options="{updateOn: 'mousedown',  debounce: 200}")
-        div(flex md-block)
-          span.error(ng-show="loginForm.username.$dirty && loginForm.username.error.$required") Please provide your account's username
+          //- ng-model-options="{updateOn: 'keyup',  debounce: 200}"
+          input(type="text" name="username" ng-model="user.username" ng-required="true" ng-minlength="6" ng-pattern="/^([a-zA-Z])[a-zA-Z0-9._]+$/")
+        div(flex layout="column" md-block)
+          span.error(flex ng-show="login.username.$dirty && login.username.$error.required") Please provide your account's username
+          span.error(flex ng-show="login.username.$dirty && login.username.$error.minlength") Username must be of 6 characters or more
+          span.error(flex ng-show="login.username.$dirty && login.username.$invalid") Please provide a valid username
 
     .container(md-block flex layout="row")
       div(flex=10)
@@ -17,8 +20,9 @@ md-card.border-round(flex layout-padding)
         md-input-container(md-block)
           label Password
           input(type="password" name="password" ng-model="user.password" ng-required="true" ng-minlength="6" ng-model-options="{updateOn: 'mousedown',  debounce: 200}")
-        div(flex md-block)
-          span.error(ng-show="loginForm.password.$dirty && loginForm.password.error.$required") A password is required to log you in
+        div(flex layout="column" md-block)
+          span.error(flex ng-show="login.password.$dirty && login.password.$error.required") A password is required to log you in
+          span.error(flex ng-show="login.password.$dirty && login.password.$error.minlength") Password must be of 6 characters or more
 
     .container(md-block flex layout="row")
-      button(flex type="submit").md-button.md-accent.md-raised.md-hue-2 Log in
+      button(flex type="submit" ng-disabled="login.$invalid" ng-class="{'md-accent': login.$valid, 'md-warn': login.$invalid}").md-button.md-raised.md-hue-2 Log in
