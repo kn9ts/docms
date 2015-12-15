@@ -1,3 +1,6 @@
+// load the applications environment
+require('dotenv').load();
+
 var gulp = require('gulp'),
   plumber = require('gulp-plumber'),
   rename = require('gulp-rename'),
@@ -23,43 +26,55 @@ var gulp = require('gulp'),
   browserSync = require('browser-sync'),
   nodemon = require('gulp-nodemon'),
   karma = require('gulp-karma'),
+  mocha = require('gulp-mocha'),
   protractor = require('gulp-protractor').protractor,
   cachebust = new CacheBuster(),
+  coveralls = require('gulp-coveralls'),
   paths = {
     public: 'public/**',
-    jade: ['!app/includes/*.jade', 'app/**/*.jade'],
-    scripts: 'app/scripts/**/*.js',
-    backendScripts: 'server/**/*.+(js|coffee)',
     images: 'app/images/**/*',
+    jade: ['!app/includes/*.jade', 'app/**/*.jade'],
+    styles: ['app/styles/*.+(less|css)', 'app/styles/layouts/*.+(less|css)', 'app/styles/base/*.+(less|css)'],
     staticFiles: [
       '!app/**/*.+(less|css|js|jade)',
       '!app/images/**/*',
       'app/**/*.*'
     ],
-    unitTests: [
-      'public/vendor/angular/angular.min.js',
-      'public/vendor/angular-ui-router/release/angular-ui-router.min.js',
-      'public/vendor/angular-resource/angular-resource.min.js',
-      'public/vendor/angular-mocks/angular-mocks.js',
-      'public/js/application.js',
-      'tests/unit/*.spec.js'
-    ],
-    libTests: ['public/vendor/tests/**/*.js'],
-    styles: ['app/styles/*.+(less|css)', 'app/styles/layouts/*.+(less|css)',  'app/styles/base/*.+(less|css)']
+    scripts: 'app/scripts/**/*.js',
+    backendScripts: 'server/**/*.+(js|coffee)',
+    unitTests: [],
+    serverTests: ['tests/resources/**/*.spec.js'],
+    libTests: ['public/lib/tests/**/*.js']
   };
 
-gulp.task('test', function() {
+gulp.task('cover', function() {
+  return gulp.src('coverage/lcov/lcov.info')
+    .pipe(coveralls());
+});
+
+gulp.task('test:fend', function() {
   // Be sure to return the stream
   return gulp.src(paths.unitTests)
     .pipe(karma({
       configFile: __dirname + '/karma.conf.js',
-      // autoWatch: false,
-      singleRun: true,
       action: 'run'
     }))
     .on('error', function(err) {
       // Make sure failed tests cause gulp to exit non-zero
       throw err;
+    });
+});
+
+gulp.task('test:bend', function() {
+  return gulp.src(paths.serverTests)
+    .pipe(mocha({
+      reporter: 'spec'
+    }))
+    .once('error', function() {
+      process.exit(1);
+    })
+    .once('end', function() {
+      process.exit();
     });
 });
 
@@ -88,7 +103,7 @@ gulp.task('clean-styles', function() {
 });
 
 gulp.task('clean-scripts', function() {
-  return gulp.src('public/js/*.+(js|map)', {
+  return gulp.src('public/js/**/*.+(js|map)', {
       read: false
     })
     .pipe(require('gulp-clean')());
@@ -157,7 +172,15 @@ gulp.task('browserify', function() {
   var b = browserify({
     entries: './app/scripts/application.js',
     debug: true,
-    paths: ['./app/js/controllers', './app/js/factories', './app/js/services', './app/js/directives', './app/js/filters'],
+    paths: [
+      './app/scripts/controllers',
+      './app/scripts/decorators',
+      './app/scripts/services',
+      './app/scripts/directives',
+      './app/scripts/filters',
+      './app/scripts/routes',
+      './app/scripts/*.js'
+    ],
     transform: [ngAnnotate]
   });
 
@@ -168,7 +191,7 @@ gulp.task('browserify', function() {
     .pipe(sourcemaps.init({
       loadMaps: true
     }))
-    .pipe(uglify())
+    // .pipe(uglify())
     .on('error', gutil.log)
     .pipe(sourcemaps.write('./maps'))
     // vinyl-source-stream makes the bundle compatible with gulp
@@ -200,7 +223,7 @@ gulp.task('nodemon', function() {
     })
     .on('change', ['lint'])
     .on('restart', function() {
-      console.log('>> node restart');
+      console.log('-->> application restart!');
     })
     .on('start', function(cb) {
       // to avoid nodemon being started multiple times
@@ -209,20 +232,20 @@ gulp.task('nodemon', function() {
         cb();
         started = true;
       }
-    });;
+    });
 });
 
 gulp.task('watch', function() {
   gulp.watch(paths.jade, ['jade'], browserSync.reload);
   gulp.watch(paths.styles, ['less'], browserSync.reload);
   gulp.watch(paths.scripts, ['browserify'], browserSync.reload);
-  gulp.watch(['./gulpfile.js'], ['build']);
+  gulp.watch(['./gulpfile.js'], ['build', 'watch'], browserSync.reload);
 });
 
 // Default configs
 gulp.task('build', ['clean', 'jade', 'less', 'static-files', 'images', 'browserify'], browserSync.reload);
-gulp.task('default', ['nodemon', 'watch', 'build']);
-gulp.task('production', ['nodemon', 'build']);
+gulp.task('default', ['build', 'nodemon', 'watch']);
+gulp.task('production', ['build', 'nodemon']);
 
 // Helpers
 gulp.task('clean', ['clean-scripts', 'clean-styles']);
@@ -234,3 +257,7 @@ gulp.task('ci', ['nodemon', 'browser-sync']);
 // For heroku
 gulp.task('heroku:production', ['bower', 'build']);
 gulp.task('heroku:staging', ['bower', 'build']);
+
+// Tests
+gulp.task('bb', ['bower', 'browserify']);
+gulp.task('test', ['test:fend', 'test:bend' /*, 'e2e' */ , 'coverage']);
