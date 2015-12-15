@@ -10,7 +10,7 @@ appFilters.filter('capitalize', function() {
   };
   return function(input) {
     //if input string, do capitalize
-    return typeof input == "string" ? input.capitalize() : input;
+    return typeof input == 'string' ? input.capitalize() : input;
   };
 });
 
@@ -18,6 +18,6 @@ appFilters.filter('timeago', function() {
   return function(input, format) {
     //if formating is needed to return a humanized date
     // return format ? moment.unix(input).format('LL'): moment.unix(input).fromNow();
-    return format ? moment(input, "YYYY-MM-DD HH:mm").format('LL') : moment(input, "YYYY-MM-DD HH:mm").fromNow();
+    return format ? moment(input, 'YYYY-MM-DD HH:mm').format('LL') : moment(input, 'YYYY-MM-DD HH:mm').fromNow();
   };
 });

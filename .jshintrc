@@ -30,6 +30,7 @@
     "jQuery",
     "jasmine",
     "module",
+    "moment",
     "require",
     "should",
     "process"

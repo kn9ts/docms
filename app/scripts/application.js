@@ -1,4 +1,4 @@
-(function(self_invoke) {
+(function() {
   'use strict';
   require('./filters/filters');
 
@@ -51,8 +51,10 @@
   // Decorate the user $resource instance
   // extends the user $resource instance with login, session and logout methods
   app.config(['$provide', '$httpProvider',
-    function($provide, $httpProvider) {
-      $provide.decorator('User', ['$delegate', '$http', '$state', '$rootScope', '$cookies', require('./decorators/user')]);
+    function($provide) {
+      $provide.decorator('User', [
+        '$delegate', '$http', '$rootScope', '$state', '$cookies', require('./decorators/user')
+      ]);
       $provide.decorator('Document', ['$delegate', '$http', require('./decorators/document')]);
     }
   ]);
@@ -60,17 +62,22 @@
   // Controllers
   app.controller('appController', ['$scope', require('./controllers/app')]);
   app.controller('headerController', ['$rootScope', '$scope', '$state', 'User', require('./controllers/header')]);
-
-  app.controller('loginController', ['$rootScope', '$scope', '$state', '$cookies', 'User', require('./controllers/login')]);
+  app.controller('loginController', [
+    '$rootScope', '$scope', '$state', '$cookies', 'User', require('./controllers/login')
+  ]);
   app.controller('createAccountController', ['$scope', '$state', 'User', require('./controllers/createAccount')]);
-  app.controller('accountController', ['$http', '$rootScope', '$scope', '$state', '$stateParams', '$cookies', 'User', require('./controllers/account')]);
-
-  app.controller('dashboardController', ['$scope', '$state', '$cookies', 'User', 'Document', require('./controllers/dashboard')]);
-  app.controller('documentController', ['$rootScope', '$scope', '$state', '$stateParams', 'Document', require('./controllers/document')]);
-
+  app.controller('accountController', [
+    '$http', '$rootScope', '$scope', '$state', '$stateParams', '$cookies', 'User', require('./controllers/account')
+  ]);
+  app.controller('dashboardController', [
+    '$scope', '$state', '$cookies', 'User', 'Document', require('./controllers/dashboard')
+  ]);
+  app.controller('documentController', [
+    '$rootScope', '$scope', '$state', '$stateParams', 'Document', require('./controllers/document')
+  ]);
 
   // Routing and configurations
   app.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', require('./router')]);
 
   return app;
-})(true);
+})();

@@ -3,7 +3,6 @@ var loginController = function($rootScope, $scope, $state, $cookies, User) {
     username: 'eugene',
     password: 'password'
   };
-  // {username: 'christa_ullrich', password: 'password1'};
 
   $scope.loginUser = function() {
     // login user

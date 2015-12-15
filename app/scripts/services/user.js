@@ -1,5 +1,4 @@
-var user = function($resource, $http) {
-  // http://localhost:3333/api/users/564ee2f04860682418479a61
+var user = function($resource) {
   var api = $resource('/api/users/:id', {
     id: '@_id'
   }, {

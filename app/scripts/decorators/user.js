@@ -1,4 +1,4 @@
-module.exports = function($delegate, $http, $state, $rootScope, $cookies) {
+module.exports = function($delegate, $http, $rootScope, $state, $cookies) {
   $delegate.login = function(user, cb) {
     var scope = this; // User
 

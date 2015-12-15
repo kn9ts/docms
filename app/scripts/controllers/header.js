@@ -6,8 +6,11 @@ var headerController = function($rootScope, $scope, $state, User) {
         console.error(err.error);
         return;
       }
-      // get out of the dashboard
-      $state.go('entrance');
+
+      if (res) {
+        // get out of the dashboard
+        $state.go('entrance');
+      }
     });
   };
 

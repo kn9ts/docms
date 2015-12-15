@@ -7,7 +7,7 @@ var accountController = function($http, $rootScope, $scope, $state, $stateParams
     $scope.buttonTitle = 'Just a minute: updating...';
     // update user's information
     User.update($rootScope.user, function(res) {
-      var user = User.customiseUser(res.user);
+      User.customiseUser(res.user);
       $scope.buttonTitle = 'Account Details Updated!';
     });
   };

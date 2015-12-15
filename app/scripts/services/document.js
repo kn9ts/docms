@@ -1,4 +1,4 @@
-var documents = function($resource, $http) {
+var documents = function($resource) {
   var api = $resource('/api/documents/:id', {
     id: '@_id'
   }, {
