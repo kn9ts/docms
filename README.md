@@ -1,7 +1,7 @@
 # DOCMS
 #### CLI Document Management System resting on RESTful server
 
-[![Coverage Status](https://coveralls.io/repos/kn9ts/docms/badge.svg?branch=feature%2Fdashboard&service=github)](https://coveralls.io/github/kn9ts/docms?branch=feature%2Fdashboard)
+[![Coverage Status](https://coveralls.io/repos/kn9ts/docms/badge.svg?branch=master&service=github)](https://coveralls.io/github/kn9ts/docms?branch=master)
 
 The system manages documents, users and user roles. Each document defines access rights; the document defines which roles can access it. Also, each document specifies the date it was published.
 
