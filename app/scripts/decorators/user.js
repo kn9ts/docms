@@ -1,15 +1,17 @@
 module.exports = function($delegate, $http, $rootScope, $state, $cookies) {
+  // in this case $delegate == User
   $delegate.login = function(user, cb) {
     var scope = this; // User
 
     // if user is not provided in parameters
     // they probably exist in the $data property
     if (!user) {
-      user = this.$data;
-      if (!user) {
+      if (!this.$data) {
         cb(new Error('user\'s object has not been provided'));
         return;
       }
+      // If it exists, assign to user
+      user = this.$data;
     }
 
     $http.post('/api/users/login', user).success(function(res) {
@@ -32,7 +34,7 @@ module.exports = function($delegate, $http, $rootScope, $state, $cookies) {
     var scope = this;
     $http.get('/api/users/logout').success(function(res) {
       // Remove the token from the headers
-      $http.defaults.headers.common['x-access-token'] = undefined;
+      delete $http.defaults.headers.common['x-access-token'];
 
       // removed the persisted data
       delete scope.$data;
@@ -73,7 +75,6 @@ module.exports = function($delegate, $http, $rootScope, $state, $cookies) {
     // Extend the user with the built in resource parameters to the response
     angular.extend(user, scope.prototype);
     $rootScope.user = scope.$data = user;
-    console.log('FETCHED_USER', $rootScope.user);
 
     return user;
   };

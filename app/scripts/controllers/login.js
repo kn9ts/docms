@@ -1,4 +1,4 @@
-var loginController = function($rootScope, $scope, $state, $cookies, User) {
+var loginController = function($scope, $state, User) {
   $scope.user = {
     username: 'eugene',
     password: 'password'
@@ -8,13 +8,9 @@ var loginController = function($rootScope, $scope, $state, $cookies, User) {
     // login user
     User.login($scope.user, function(err, user) {
       if (err) {
-        console.log(err);
-        return;
+        throw err;
       }
-
       console.log('LOGGEDIN_USER', user);
-      // user.name.last = 'Mutai';
-      // user.$update();
 
       $state.go('dashboard', {
         id: user.username

@@ -1,11 +1,12 @@
-var documentController = function($rootScope, $scope, $state, $stateParams, Document) {
+var documentController = function($rootScope, $scope, $state, $stateParams, Docs) {
   $scope.buttonTitle = $stateParams.id === 'new' ? 'Create Document' : 'Update Document';
-  $scope.document = $scope.response = {};
+  $scope.response = {};
+  $scope.document = {};
   $scope.document.isPrivate = false;
 
   // if it's not a new document, fetch it's content from the servers
   if ($stateParams.id !== 'new') {
-    Document.get({
+    Docs.get({
       id: $stateParams.id
     }, function(res) {
       $scope.document = res.document;
@@ -13,7 +14,7 @@ var documentController = function($rootScope, $scope, $state, $stateParams, Docu
     });
   }
 
-  $scope.submitDocument = function(doc) {
+  $scope.submitDocument = function() {
     // if it's a new doc, set the private parametre
     if ($stateParams.id === 'new') {
       $scope.document.private = $scope.document.isPrivate;
@@ -21,11 +22,11 @@ var documentController = function($rootScope, $scope, $state, $stateParams, Docu
 
     // new documents use save, and update for updating an existing a document
     var action = $stateParams.id === 'new' ? 'save' : 'update';
-    Document[action]($scope.document, function(response) {
+    Docs[action]($scope.document, function(response) {
       // document has been saved
-      console.log('Document ' + action, response);
+      console.log('Docs ' + action, response);
       $state.go('dashboard', {
-        id: $rootScope.user._id
+        id: $rootScope.user.username
       });
     }, function(err) {
       // error handler

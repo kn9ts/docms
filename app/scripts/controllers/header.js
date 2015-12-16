@@ -3,8 +3,7 @@ var headerController = function($rootScope, $scope, $state, User) {
   $scope.logoutUser = function() {
     User.logout(function(err, res) {
       if (err) {
-        console.error(err.error);
-        return;
+        throw err;
       }
 
       if (res) {

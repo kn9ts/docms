@@ -1,26 +1,22 @@
-var dashboardController = function($scope, $state, $cookies, User, Document) {
+var dashboardController = function($scope, User, Docs) {
   $scope.documents = $scope.myDocuments = {};
-  console.log('DASHBOARD', User.$data);
 
   User.getDocuments(function(err, docs) {
     if (err) {
-      console.error(err);
+      throw err;
     }
 
     $scope.myDocuments = docs;
-    console.log('MYDOCUMENTS', docs);
   });
 
-  Document.query(function(res) {
+  Docs.query(function(res) {
     $scope.documents = res.documents;
-    console.log('DOCUMENTS', $scope.documents);
   });
 
   $scope.deleteDocument = function(doc) {
-    var deleteThisDoc = new Document(doc);
+    var deleteThisDoc = new Docs(doc);
     deleteThisDoc.$remove(function() {
       // document deleted
-      console.log('DOCUMENT DELETED', deleteThisDoc);
       // update the documents lists, filter out the removed doc
       $scope.documents = $scope.documents.filter(function(d) {
         return d._id !== doc._id;
@@ -32,15 +28,13 @@ var dashboardController = function($scope, $state, $cookies, User, Document) {
   // when a search param is submitted, update the documents
   // list with user's search request
   $scope.$on('seach_param_submitted', function(event, search) {
-    Document.search(search.term, function(err, res) {
+    Docs.search(search.term, function(err, res) {
       if (err) {
-        console.log(err);
-        return;
+        throw err;
       }
 
       // documents were found
       $scope.documents = res.documents;
-      console.log('SEARCH_DOCUMENTS', $scope.documents);
     });
   });
 };

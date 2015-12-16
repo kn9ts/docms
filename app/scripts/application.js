@@ -20,11 +20,19 @@
   }]);
 
   // Run this as soon as the app bootstraps
-  app.run(['$http', '$rootScope', '$state', '$cookies', 'User', function($http, $rootScope, $state, $cookies, User) {
+  app.run(['$rootScope', '$state', 'User', function($rootScope, $state, User) {
+    $rootScope.roles = [{
+      title: 'viewer'
+    }, {
+      title: 'user'
+    }, {
+      title: 'admin'
+    }];
+
     // $cookies.remove('docmsToken');
     User.session(function(err, user) {
       if (err) {
-        console.info(err.error);
+        throw err;
       }
 
       // if a session exits, login user and redirect to the dashboard
@@ -34,46 +42,29 @@
         });
       }
     });
-
-    $rootScope.roles = [{
-      title: 'viewer'
-    }, {
-      title: 'user'
-    }, {
-      title: 'admin'
-    }];
   }]);
 
   // Services, Factories and Providers
-  app.factory('User', ['$resource', '$http', require('./services/user')]);
-  app.factory('Document', ['$resource', '$http', require('./services/document')]);
+  app.factory('User', ['$resource', require('./services/user')]);
+  app.factory('Docs', ['$resource', require('./services/document')]);
 
   // Decorate the user $resource instance
   // extends the user $resource instance with login, session and logout methods
-  app.config(['$provide', '$httpProvider',
-    function($provide) {
-      $provide.decorator('User', [
-        '$delegate', '$http', '$rootScope', '$state', '$cookies', require('./decorators/user')
-      ]);
-      $provide.decorator('Document', ['$delegate', '$http', require('./decorators/document')]);
-    }
-  ]);
+  app.config(['$provide', function($provide) {
+    $provide.decorator('User', [
+      '$delegate', '$http', '$rootScope', '$state', '$cookies', require('./decorators/user')
+    ]);
+    $provide.decorator('Docs', ['$delegate', '$http', require('./decorators/document')]);
+  }]);
 
   // Controllers
-  app.controller('appController', ['$scope', require('./controllers/app')]);
   app.controller('headerController', ['$rootScope', '$scope', '$state', 'User', require('./controllers/header')]);
-  app.controller('loginController', [
-    '$rootScope', '$scope', '$state', '$cookies', 'User', require('./controllers/login')
-  ]);
+  app.controller('loginController', ['$scope', '$state', 'User', require('./controllers/login')]);
   app.controller('createAccountController', ['$scope', '$state', 'User', require('./controllers/createAccount')]);
-  app.controller('accountController', [
-    '$http', '$rootScope', '$scope', '$state', '$stateParams', '$cookies', 'User', require('./controllers/account')
-  ]);
-  app.controller('dashboardController', [
-    '$scope', '$state', '$cookies', 'User', 'Document', require('./controllers/dashboard')
-  ]);
+  app.controller('accountController', ['$rootScope', '$scope', 'User', require('./controllers/account')]);
+  app.controller('dashboardController', ['$scope', 'User', 'Docs', require('./controllers/dashboard')]);
   app.controller('documentController', [
-    '$rootScope', '$scope', '$state', '$stateParams', 'Document', require('./controllers/document')
+    '$rootScope', '$scope', '$state', '$stateParams', 'Docs', require('./controllers/document')
   ]);
 
   // Routing and configurations

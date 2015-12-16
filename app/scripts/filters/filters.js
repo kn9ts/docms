@@ -1,7 +1,7 @@
-var appFilters = angular.module('app.filters', []);
+var utils = angular.module('app.filters', []);
 
 // Capitalization
-appFilters.filter('capitalize', function() {
+utils.filter('capitalize', function() {
   // FUNCTION TO CAPITALIZE THE !ST LETTERS IN A STRING
   String.prototype.capitalize = function() {
     return this.replace(/(^|\s)([a-z])/g, function(m, p1, p2) {
@@ -10,11 +10,11 @@ appFilters.filter('capitalize', function() {
   };
   return function(input) {
     //if input string, do capitalize
-    return typeof input == 'string' ? input.capitalize() : input;
+    return typeof input === 'string' ? input.capitalize() : input;
   };
 });
 
-appFilters.filter('timeago', function() {
+utils.filter('timeago', function() {
   return function(input, format) {
     //if formating is needed to return a humanized date
     // return format ? moment.unix(input).format('LL'): moment.unix(input).fromNow();

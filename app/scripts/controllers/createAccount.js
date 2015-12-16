@@ -25,9 +25,9 @@ var createAccountController = function($scope, $state, User) {
       // login them automatically
       User.login($scope.user, function(err, user) {
         if (err) {
-          console.log(err);
-          return;
+          throw err;
         }
+
         $state.go('dashboard', {
           id: user.username
         });
