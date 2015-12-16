@@ -1,13 +1,10 @@
 // load the applications environment
 require('dotenv').load();
 
-var moment = require('moment'),
-  bcrypt = require('bcrypt-nodejs'),
-  faker = require('faker'),
+var faker = require('faker'),
   mongoose = require('../server/config/database'),
   Schema = mongoose.Schema,
   Users = require('../server/models/users')(mongoose, Schema),
-  Roles = require('../server/models/roles')(mongoose, Schema),
   Documents = require('../server/models/documents')(mongoose, Schema),
   exit = require('./exit'),
   documentstoCreate = 20;
