@@ -32,10 +32,12 @@ module.exports = function(config) {
       'public/lib/angular-route/angular-route.min.js',
       'public/lib/angular-resource/angular-resource.min.js',
       'public/lib/angular-cookies/angular-cookies.min.js',
-      'public/lib/angular-mocks/angular-mocks.js',
       'public/lib/angular-aria/angular-aria.min.js',
       'public/lib/angular-animate/angular-animate.min.js',
       'public/lib/angular-material/angular-material.min.js',
+
+      // for testing angularjs
+      'public/lib/angular-mocks/angular-mocks.js',
 
       // include js files
       'public/lib/moment/min/moment.min.js',

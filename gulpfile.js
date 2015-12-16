@@ -260,4 +260,4 @@ gulp.task('heroku:staging', ['bower', 'build']);
 
 // Tests
 gulp.task('bb', ['bower', 'browserify']);
-gulp.task('test', ['test:fend', 'test:bend' /*, 'e2e' */ , 'coverage']);
+gulp.task('test', ['test:fend' /*, 'test:bend', 'e2e' */ , 'cover']);

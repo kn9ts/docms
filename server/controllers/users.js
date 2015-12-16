@@ -82,6 +82,9 @@ Users.prototype = {
         }
 
         req.session.destroy(function(err) {
+          if (err) {
+            next(err);
+          }
           // cannot access session here
           res.status(200).json({
             message: 'User has been logged out'
