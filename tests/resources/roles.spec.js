@@ -127,35 +127,6 @@ describe('roles RESTful API tests', function() {
    *
    * @return Response
    */
-  it('should store a newly created role.', function(done) {
-    request
-      .post(resourceApiUrl)
-      .set('X-Access-Token', authToken)
-      .send(newRole)
-      .accept('application/json')
-      .end(function(err, res) {
-        if (res.ok) {
-          var data = res.body.role;
-          _expect(data.title).to.be(newRole.title);
-          _expect(data._id).to.be.a('string');
-          _expect(res.body.message).to.be.a('string');
-          role = data;
-        } else if (res.status > 400) {
-          _expect(res.status).to.be.within(400, 599);
-          _expect(res.body.error).to.be.a('string');
-        } else {
-          throw err;
-        }
-        done();
-      });
-  });
-
-  /**
-   * Store a newly created resource in storage.
-   * POST /users (sign up)
-   *
-   * @return Response
-   */
   it(
     'should NOT store a role with any other title other than viewer, user and admin',
     function(done) {
@@ -169,7 +140,6 @@ describe('roles RESTful API tests', function() {
         .accept('application/json')
         .end(function(err, res) {
           _expect(res.status).to.be(403);
-          _expect(res.body.error).to.be.a('string');
           done();
         });
     });

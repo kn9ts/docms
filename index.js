@@ -83,12 +83,14 @@ app.use(function(err, req, res) {
   var stack = err.stack.split(/\n/).map(function(err) {
     return err.replace(/\s{2,}/g, ' ').trim();
   });
-  res.json({
+
+  var errorResponse = {
     api: err,
     url: req.originalUrl,
     error: err.message,
     stack: stack
-  });
+  };
+  res.json(errorResponse);
 });
 
 var server = app.listen(process.env.PORT || 3000, function() {
