@@ -43,6 +43,7 @@
   },
   "homepage": "https://github.com/kn9ts/docms#readme",
   "dependencies": {
+    "bcrypt": "^0.8.5",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.13.2",
     "browser-sync": "^2.9.10",
