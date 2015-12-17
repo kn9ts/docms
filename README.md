@@ -2,6 +2,7 @@
 #### CLI Document Management System resting on RESTful server
 
 [![Coverage Status](https://coveralls.io/repos/kn9ts/docms/badge.svg?branch=master&service=github)](https://coveralls.io/github/kn9ts/docms?branch=master)
+[![Build Status](https://semaphoreci.com/api/v1/projects/fdd7259e-e922-4ef7-b4c2-fc2b42cdb420/638214/badge.svg)](https://semaphoreci.com/kn9ts/docms)
 
 The system manages documents, users and user roles. Each document defines access rights; 
 the document defines which roles can access it. Also, each document specifies the date it was published.
@@ -61,10 +62,10 @@ $ gulp
 
 ## Testing
 To run the tests in the `tests/` folder, both front-end and backend.
-Make sure you have mocha installed globally first.
+Make sure you have mocha and instanbul(for the coverage) installed globally first.
 
 ```bash
-$ npm i mocha -g
+$ npm i -g mocha karma karma-cli
 ```
 
 Then run:

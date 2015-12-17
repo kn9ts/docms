@@ -18,9 +18,9 @@ module.exports = function(config) {
     frameworks: ['mocha', 'sinon-chai' /*, 'chai', 'browserify' ,*/ ],
 
 
-    browserify: {
-      debug: true
-    },
+    // browserify: {
+    //   debug: true
+    // },
 
 
     // files to include, ordered by dependencies

@@ -16,6 +16,7 @@ for (var x = 0, len = roles.length; x <= len; x++) {
       }
     });
   } else {
+    console.log('ROLES has been seeded to the database');
     exit();
   }
 }

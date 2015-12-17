@@ -126,18 +126,18 @@ gulp.task('less', function() {
         this.emit('end');
       }
     }))
-    .pipe(sourcemaps.init())
     .pipe(less())
     .pipe(autoprefixer('last 2 versions'))
     .pipe(gulp.dest('public/css/'))
     .pipe(rename({
       suffix: '.min'
     }))
+    .pipe(sourcemaps.init())
     .pipe(minifycss())
     .pipe(cachebust.resources())
-    .pipe(sourcemaps.write('./maps'))
-    .pipe(rename('application.css'))
+    .pipe(rename('application.min.css'))
     .pipe(gulp.dest('public/css/'))
+    .pipe(sourcemaps.write('./maps'))
     .pipe(browserSync.reload({
       stream: true
     }))
