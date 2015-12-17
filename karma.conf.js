@@ -126,6 +126,9 @@ module.exports = function(config) {
       }, {
         type: 'cobertura',
         subdir: 'cobertura'
+      }, {
+        type: 'json',
+        subdir: 'json'
       }]
     }
   });

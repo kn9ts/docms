@@ -127,7 +127,8 @@ Roles.prototype = {
               }
             });
         } else {
-          err = new Error('The role ' + req.body.title + ' does not exists. Please create one before assign it to a user.');
+          err = new Error('The role ' + req.body.title + ' does not exists.' +
+            'Please create one before assign it to a user.');
           err.status = 404;
           return next(err);
         }

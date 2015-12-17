@@ -46,7 +46,8 @@ $ gulp
 ---
 
 ## Testing
-To confirm the REST API is working. You could run the tests in the `tests/` folder. Make sure you have mocha installed globally first.
+To run the tests in the `tests/` folder, both front-end and backend.
+Make sure you have mocha installed globally first.
 
 ```bash
 $ npm i mocha -g

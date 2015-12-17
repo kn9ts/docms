@@ -11,10 +11,10 @@ var request = require('superagent'),
 
 var models = mongoose.modelNames();
 if (_u.contains(models, 'Users')) {
-  Users = mongoose.model('Users');
+  var Users = mongoose.model('Users');
 } else {
   var Schema = mongoose.Schema;
-  Users = require('../../server/models/users')(mongoose, Schema);
+  var Users = require('../../server/models/users')(mongoose, Schema);
 }
 
 describe('doc RESTful API tests', function() {

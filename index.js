@@ -29,7 +29,7 @@ app.set('view engine', 'jade');
 //     return res.statusCode < 400;
 //   }
 // }));
-// app.use(morgan('dev'));
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false
@@ -52,14 +52,14 @@ app.use(session({
 // CORS Support in my Node.js web app written with Express
 // http://stackoverflow.com/questions/7067966/how-to-allow-cors-in-express-nodejs
 // app.use(function(req, res, next) {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, X-Access-Token");
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, X-Access-Token');
 //   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD');
 //   next();
 // });
 
 // handle OPTIONS requests from the browser
-app.options("*", function(req, res) {
+app.options('*', function(req, res) {
   res.send(200).json({
     message: 'Hello client!'
   });
@@ -77,10 +77,10 @@ app.use(function(req, res, next) {
 });
 
 // error handlers
-app.use(function(err, req, res, next) {
+app.use(function(err, req, res) {
   res.status(err.status || 500);
   // get the error stack
-  var stack = err.stack.split(/\n/).map(function(err, index) {
+  var stack = err.stack.split(/\n/).map(function(err) {
     return err.replace(/\s{2,}/g, ' ').trim();
   });
   res.json({
@@ -97,4 +97,4 @@ var server = app.listen(process.env.PORT || 3000, function() {
 });
 
 //expose app
-exports = module.exports = app;
+module.exports = app;

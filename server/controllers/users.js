@@ -27,7 +27,8 @@ Users.prototype = {
                 }
                 // is the password validly equal to its encrypted version
                 if (areMatching) {
-                  var makeTokenFromTheseUserDetailsOnly = _u.pick(user, '_id', 'username', 'name', 'email', 'role', 'dateCreated');
+                  var makeTokenFromTheseUserDetailsOnly = _u.pick(user, '_id', 'username', 'name',
+                    'email', 'role', 'dateCreated');
 
                   // if user is found and password is right
                   // create a token
@@ -240,7 +241,8 @@ Users.prototype = {
         if (user) {
           user.role = role;
           // update his token
-          var makeTokenFromTheseUserDetailsOnly = _u.pick(user, '_id', 'username', 'name', 'email', 'role', 'dateCreated');
+          var makeTokenFromTheseUserDetailsOnly = _u.pick(user, '_id', 'username', 'name',
+            'email', 'role', 'dateCreated');
           user.token = jwt.sign(makeTokenFromTheseUserDetailsOnly, req.app.get('superSecret'), {
             expiresIn: 1440 * 60 // expires in 24 hours
           });

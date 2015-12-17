@@ -13,7 +13,7 @@ describe('Testing application bootstrapping', function() {
     $provide.service('User', function() {
       this.session = function() {};
       // after declaration, stub the session method
-      sinon.stub(this, "session", function(fn) {
+      sinon.stub(this, 'session', function(fn) {
         fn(null, mockUser);
       });
     });

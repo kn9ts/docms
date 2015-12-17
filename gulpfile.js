@@ -156,7 +156,7 @@ gulp.task('less', function() {
 });
 
 gulp.task('lint', function() {
-  return gulp.src(['./app/**/*.js', './index.js', './server/**/*.js', './tests/**/*.js'])
+  return gulp.src(['./app/scripts/**/*.js', './index.js', './server/**/*.js', './tests/**/*.js'])
     .pipe(jshint('.jshintrc'))
     .pipe(jshint.reporter(jshintStylish))
     .pipe(jshint.reporter('fail'))
@@ -260,4 +260,4 @@ gulp.task('heroku:staging', ['bower', 'build']);
 
 // Tests
 gulp.task('bb', ['bower', 'browserify']);
-gulp.task('test', ['test:fend' /*, 'test:bend', 'e2e' */ , 'cover']);
+gulp.task('test', ['test:fend', 'test:bend' /*, 'e2e' */ , 'cover']);
