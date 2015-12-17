@@ -20,8 +20,15 @@ $ git clone https://github.com/kn9ts/docms.git
 #### Dependencies
 Once cloned or download(and unzipped), enter the directory and install all dependencies by running:
 
+Backend dependencies:
+
 ```bash
 $ npm install
+```
+
+Front-end dependencies:
+
+```bash
 $ bower install
 ```
 
