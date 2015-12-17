@@ -17,6 +17,22 @@ $ git clone https://github.com/kn9ts/docms.git
 
 [Click here](https://github.com/kn9ts/docms/archive/master.zip) to download.
 
+#### Global dependencies
+
+Please make sure you have installed `bower` and `gulp` globally. This applications depends heavily on both of these packages.
+
+```bash
+$ sudo npm install -g bower gulp
+```
+
+While you are it, it would be great if you installed `mocha, karma and karma-cli` globally if you intend to run the tests.
+
+```bash
+$ sudo npm install -g mocha karma karma-ci
+```
+
+__NOTE:__ For global dependencies you may have to use `sudo` before the commands as demonstrated above
+
 #### Dependencies
 Once cloned or download(and unzipped), enter the directory and install all dependencies by running:
 
@@ -69,10 +85,10 @@ $ gulp
 
 ## Testing
 To run the tests in the `tests/` folder, both front-end and backend.
-Make sure you have mocha and instanbul(for the coverage) installed globally first.
+Make sure you have mocha and karma are installed globally.
 
 ```bash
-$ npm i -g mocha karma karma-cli
+$ sudo npm i -g mocha karma karma-cli
 ```
 
 Then run:
