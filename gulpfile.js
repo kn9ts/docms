@@ -161,12 +161,12 @@ gulp.task('browserify', function() {
     entries: './app/scripts/application.js',
     debug: true,
     paths: [
-      './app/scripts/controllers',
-      './app/scripts/decorators',
-      './app/scripts/services',
-      './app/scripts/directives',
-      './app/scripts/filters',
-      './app/scripts/routes',
+      './app/scripts/controllers/*.js',
+      './app/scripts/decorators/*.js',
+      './app/scripts/services/*.js',
+      './app/scripts/directives/*.js',
+      './app/scripts/filters/*.js',
+      './app/scripts/routes/*.js',
       './app/scripts/*.js'
     ],
     transform: [ngAnnotate]
@@ -176,14 +176,14 @@ gulp.task('browserify', function() {
     .pipe(source('application.js'))
     .pipe(buffer())
     .pipe(cachebust.resources())
+    .pipe(uglify())
+    .on('error', gutil.log)
+    // vinyl-source-stream makes the bundle compatible with gulp
+    .pipe(rename('application.js'))
     .pipe(sourcemaps.init({
       loadMaps: true
     }))
-    // .pipe(uglify())
-    .on('error', gutil.log)
     .pipe(sourcemaps.write('./maps'))
-    // vinyl-source-stream makes the bundle compatible with gulp
-    .pipe(rename('application.js'))
     .pipe(gulp.dest('./public/js/'));
 });
 
