@@ -242,8 +242,8 @@ gulp.task('sync', ['default', 'browser-sync']);
 gulp.task('ci', ['nodemon', 'browser-sync']);
 
 // For heroku
-gulp.task('heroku:production', ['bower', 'build']);
-gulp.task('heroku:staging', ['bower', 'build']);
+gulp.task('heroku: production', ['bower', 'build']);
+gulp.task('heroku: staging', ['bower', 'build']);
 
 // Tests
 gulp.task('bb', ['bower', 'browserify']);
