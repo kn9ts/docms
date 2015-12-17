@@ -1,11 +1,9 @@
 'use strict';
 module.exports = function(value) {
   var envVariables = {
-      expressSessionKey: process.env.EXPRESS_SESSION_KEY,
-      database: process.env.DATABASE,
       host: process.env.HOST,
-      userName: process.env.USER_NAME,
-      password: process.env.PASSWORD,
+      database: process.env.DATABASE,
+      expressSessionKey: process.env.EXPRESS_SESSION_KEY,
       webTokenSecret: process.env.WEB_TOKEN_SECRET
     },
     environments = {

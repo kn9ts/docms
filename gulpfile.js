@@ -1,5 +1,4 @@
-// load the applications environment
-require('dotenv').load();
+require('./environment');
 
 var gulp = require('gulp'),
   plumber = require('gulp-plumber'),
@@ -248,4 +247,4 @@ gulp.task('heroku:staging', ['bower', 'build']);
 
 // Tests
 gulp.task('bb', ['bower', 'browserify']);
-gulp.task('test', ['test:fend', 'test:bend' /*, 'e2e' */ , 'cover']);
+gulp.task('test', ['test:fend', 'test:bend' /*, 'e2e' */]);

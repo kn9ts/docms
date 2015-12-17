@@ -1,5 +1,4 @@
-// load the applications environment
-require('dotenv').load();
+require('../environment');
 
 var faker = require('faker'),
   mongoose = require('../server/config/database'),
