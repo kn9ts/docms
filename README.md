@@ -3,7 +3,8 @@
 
 [![Coverage Status](https://coveralls.io/repos/kn9ts/docms/badge.svg?branch=master&service=github)](https://coveralls.io/github/kn9ts/docms?branch=master)
 
-The system manages documents, users and user roles. Each document defines access rights; the document defines which roles can access it. Also, each document specifies the date it was published.
+The system manages documents, users and user roles. Each document defines access rights; 
+the document defines which roles can access it. Also, each document specifies the date it was published.
 
 Users are categorized by roles. Each user must have a role defined for them.
 
@@ -24,7 +25,8 @@ $ bower install
 ```
 
 #### Seeding
-Once the dependencies have been installed, you have to seed the database with roles, a user and a few documents allegedly created by the user.
+Once the dependencies have been installed, you have to seed the database with roles, 
+a user and a few documents allegedly created by the user.
 
 ```bash
 $ node seeds/roles.js
@@ -32,13 +34,25 @@ $ node seeds/user.js
 $ node seeds/documents.js
 ```
 
-The seeding has not been perfected but `works` well. Wait for a second before pressing `CTRL + C` to terminate the process. Seeding is done in mere microseconds so terminating the app does not affect anything.
+#### ENV File
+
+You need an `.env` file where the application can pick `ENV` configurations before booting up.
+
+There is an example `.env` file by the name `.env.example` that can be used. 
+You will have to rename the ENV file to `.env`
+
+Run this quick command to do so:
+
+```
+$ mv .env.example .env
+```
 
 Now the app is ready to be used.
 
 ## Usage
 
-from the command line run the command below, and open the browser at [http://localhost:3333](http://localhost:3333):
+From the command line run the command below, 
+and open the browser at [http://localhost:3000](http://localhost:3000):
 
 ```
 $ gulp
