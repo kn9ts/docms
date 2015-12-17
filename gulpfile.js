@@ -229,22 +229,15 @@ gulp.task('watch', function() {
   gulp.watch(['./gulpfile.js'], ['build', 'watch'], browserSync.reload);
 });
 
-// Default configs
-gulp.task('build', ['clean', 'jade', 'less', 'static-files', 'images', 'browserify'], browserSync.reload);
-gulp.task('default', ['build', 'nodemon', 'watch']);
-gulp.task('production', ['build', 'nodemon']);
-
 // Helpers
 gulp.task('clean', ['clean-scripts', 'clean-styles']);
-gulp.task('sync', ['default', 'browser-sync']);
-
-// For continuous intergration tools
-gulp.task('ci', ['nodemon', 'browser-sync']);
-
+// Default configs
+gulp.task('build', ['jade', 'less', 'static-files', 'images', 'browserify', 'bower']);
+gulp.task('sync', ['clean', 'default', 'browser-sync']);
 // For heroku
-gulp.task('heroku: production', ['bower', 'build']);
-gulp.task('heroku: staging', ['bower', 'build']);
-
+gulp.task('heroku:production', ['build']);
+gulp.task('heroku:staging', ['build']);
+gulp.task('default', ['nodemon', 'watch', 'build']);
+gulp.task('production', ['nodemon', 'build']);
 // Tests
-gulp.task('bb', ['bower', 'browserify']);
-gulp.task('test', ['test:fend', 'test:bend' /*, 'e2e' */]);
+gulp.task('test', ['test:fend', 'test:bend' /*, 'e2e' */ ]);
