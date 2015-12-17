@@ -1,5 +1,5 @@
 'use strict';
-var bcrypt = require('bcrypt-nodejs'),
+var bcrypt = require('bcrypt'),
   jwt = require('jsonwebtoken'),
   _u = require('underscore'),
   Users = function() {};
