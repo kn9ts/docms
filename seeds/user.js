@@ -1,4 +1,4 @@
-require('./environment');
+require('../environment');
 
 var moment = require('moment'),
   bcrypt = require('bcrypt-nodejs'),
