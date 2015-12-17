@@ -78,18 +78,6 @@ gulp.task('test:bend', function() {
     });
 });
 
-gulp.task('e2e', function(done) {
-  var args = ['--baseUrl', 'http://127.0.0.1:3000'];
-  gulp.src(['./tests/e2e/*.js'])
-    .pipe(protractor({
-      configFile: 'protractor.conf.js',
-      args: args
-    }))
-    .on('error', function(e) {
-      throw e;
-    });
-});
-
 gulp.task('bower', function() {
   return bower()
     .pipe(gulp.dest('public/vendor/'));
@@ -201,10 +189,10 @@ gulp.task('browserify', function() {
 
 gulp.task('browser-sync', function() {
   browserSync.init(null, {
-    proxy: 'http://localhost:3333',
+    proxy: 'http://localhost:3000',
     files: ['public/**/*.*'],
     browser: 'google chrome',
-    port: 3000,
+    port: 3550,
   });
 });
 
