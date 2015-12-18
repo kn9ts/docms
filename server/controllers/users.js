@@ -95,14 +95,14 @@ Users.prototype = {
     });
   },
   session: function(req, res, next) {
-    // req.decoded.token = req.headers['x-access-token'];
     if (req.session.hasOwnProperty('user')) {
-      return res.json({
+      return res.status(200).json({
         user: req.session.user,
         message: 'You are logged in as ' + req.session.user.username
       });
     } else {
       var err = new Error('No user is logged in.');
+      err.status = 404;
       return next(err);
     }
   },
