@@ -16,7 +16,7 @@ if (_u.contains(models, 'Users')) {
   var Users = require('../../server/models/users')(mongoose, Schema);
 }
 
-describe('doc RESTful API tests', function() {
+describe('Documents RESTful API tests', function() {
   var user = {
       username: (faker.internet.userName()).toLowerCase(),
       password: faker.internet.password(),

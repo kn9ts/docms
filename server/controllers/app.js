@@ -27,9 +27,9 @@ App.prototype = {
     } else {
       // if there is no token
       // return an error
-      var newError = new Error('Unauthorised. No user is not logged in.');
-      newError.status = 401;
-      return next(newError);
+      return res.status(401).json({
+        error: 'Unauthorised. No user is not logged in.'
+      });
     }
   }
 };
