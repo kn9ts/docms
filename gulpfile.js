@@ -139,7 +139,7 @@ gulp.task('less', function() {
     .pipe(sourcemaps.write('./maps'))
     .pipe(browserSync.reload({
       stream: true
-    }))
+    }));
 });
 
 gulp.task('lint', function() {
@@ -212,14 +212,6 @@ gulp.task('nodemon', function() {
     .on('restart', function() {
       console.log('-->> application restart!');
     })
-    .on('start', function(cb) {
-      // to avoid nodemon being started multiple times
-      // thanks @matthisk
-      if (!started) {
-        cb();
-        started = true;
-      }
-    });
 });
 
 gulp.task('watch', function() {
