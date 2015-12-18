@@ -58,8 +58,7 @@ Users.prototype = {
               });
           } else {
             err = new Error('The username specified does not exist. Create one?');
-            err.status = 404;
-            return next(err);
+            next(err);
           }
         });
     } else {

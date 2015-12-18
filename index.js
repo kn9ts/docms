@@ -5,7 +5,7 @@ var express = require('express'),
   path = require('path'),
   config = require('./server/config')(process.env.NODE_ENV),
   // favicon = require('serve-favicon'),
-  // logger = require('morgan'),
+  logger = require('morgan'),
   cookieParser = require('cookie-parser'),
   bodyParser = require('body-parser'),
   session = require('express-session'),
@@ -20,7 +20,7 @@ app.set('models', models);
 app.set('views', path.join(__dirname, 'server/views'));
 app.set('view engine', 'jade');
 
-// app.use(logger('dev'));
+app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false
@@ -61,6 +61,7 @@ app.use(function(err, req, res) {
   var stack = err.stack.split(/\n/).map(function(err) {
     return err.replace(/\s{2,}/g, ' ').trim();
   });
+  console.log('ERROR PASSING THROUGH', err.message);
   // send out the error as json
   res.json({
     api: err,
