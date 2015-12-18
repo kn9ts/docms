@@ -28,7 +28,7 @@ $ sudo npm install -g bower gulp
 While you are it, it would be great if you installed `mocha, karma and karma-cli` globally if you intend to run the tests.
 
 ```bash
-$ sudo npm install -g mocha karma karma-ci
+$ sudo npm install -g mocha karma karma-cli
 ```
 
 __NOTE:__ For global dependencies you may have to use `sudo` before the commands as demonstrated above
