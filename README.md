@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/kn9ts/docms/badge.svg?branch=master&service=github)](https://coveralls.io/github/kn9ts/docms?branch=master)
 [![Build Status](https://semaphoreci.com/api/v1/projects/fdd7259e-e922-4ef7-b4c2-fc2b42cdb420/638214/shields_badge.svg)](https://semaphoreci.com/kn9ts/docms)
 
-The system manages documents, users and user roles. Each document defines access rights; 
+The system manages documents, users and user roles. Each document defines access rights;
 the document defines which roles can access it. Also, each document specifies the date it was published.
 
 Users are categorized by roles. Each user must have a role defined for them.
@@ -49,7 +49,7 @@ $ bower install
 ```
 
 #### Seeding
-Once the dependencies have been installed, you have to seed the database with roles, 
+Once the dependencies have been installed, you have to seed the database with roles,
 a user and a few documents allegedly created by the user.
 
 ```bash
@@ -62,7 +62,7 @@ $ node seeds/documents.js
 
 You need an `.env` file where the application can pick `ENV` configurations before booting up.
 
-There is an example `.env` file by the name `.env.example` that can be used. 
+There is an example `.env` file by the name `.env.example` that can be used.
 You will have to rename the ENV file to `.env`
 
 Run this quick command to do so:
@@ -75,7 +75,7 @@ Now the app is ready to be used.
 
 ## Usage
 
-From the command line run the command below, 
+From the command line run the command below,
 and open the browser at [http://localhost:3000](http://localhost:3000):
 
 ```
@@ -97,4 +97,4 @@ Then run:
 $ npm test
 ```
 
-__(c) 2015. Made with <3 by Eugene Mutai. #TIA__
+__(c) 2015. Made with :heart: by Eugene Mutai. #TIA__
