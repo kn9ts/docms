@@ -1,8 +1,8 @@
 var createAccountController = function($scope, $state, User) {
   $scope.buttonTitle = 'Create Account';
-
   // if false hides the password and confirm password piece
   $scope.isUpdate = false;
+  $scope.response = {};
 
   $scope.user = {
     username: 'hannah_koskei',
@@ -11,7 +11,9 @@ var createAccountController = function($scope, $state, User) {
       last: 'Koskei'
     },
     email: 'hannah_koskei@gmail.com',
-    role: 'viewer'
+    role: 'viewer',
+    password: 'password',
+    passwordConfirm: 'password'
   };
 
   $scope.createOrUpdateAccount = function() {
@@ -25,13 +27,19 @@ var createAccountController = function($scope, $state, User) {
       // login them automatically
       User.login($scope.user, function(err, user) {
         if (err) {
-          throw err;
+          $scope.response.error = err.split('<br>')[0];
+          return;
+        } else {
+          $scope.response.error = null;
+          $state.go('dashboard', {
+            id: user.username
+          });
         }
-
-        $state.go('dashboard', {
-          id: user.username
-        });
       });
+    }, function(err) {
+      if (err) {
+        $scope.response.error = err.data.split('<br>')[0];
+      }
     });
 
   };

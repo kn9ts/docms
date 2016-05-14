@@ -1,5 +1,4 @@
-// load the applications environment
-require('dotenv').load();
+require('../environment');
 
 var moment = require('moment'),
   bcrypt = require('bcrypt-nodejs'),

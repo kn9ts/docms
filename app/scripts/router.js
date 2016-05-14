@@ -1,5 +1,4 @@
-module.exports = function($stateProvider, $urlRouterProvider, $locationProvider) {
-
+module.exports = function($stateProvider, $urlRouterProvider /*, $locationProvider */ ) {
   var Route = $stateProvider;
   // For any unmatched url, redirect to / (root route)
   $urlRouterProvider.otherwise('/');
@@ -10,5 +9,5 @@ module.exports = function($stateProvider, $urlRouterProvider, $locationProvider)
     .state('account', require('./routes/account'))
     .state('document', require('./routes/document'));
 
-  $locationProvider.html5Mode(true);
+  // $locationProvider.html5Mode(true);
 };

@@ -6,7 +6,7 @@ describe('accountController', function() {
       last: 'Koskei'
     },
     email: 'hannah_koskei@gmail.com',
-    role: 'userResource'
+    role: 'user'
   };
 
   beforeEach(module('app'));
@@ -36,6 +36,7 @@ describe('accountController', function() {
 
   it('button title should be defined', function() {
     expect(scope.buttonTitle).to.be.a('string');
+    expect(scope.buttonTitle).to.be.equal('Update Details');
   });
 
   it('isUpdate is set to true, and is boolean', function() {
@@ -44,9 +45,9 @@ describe('accountController', function() {
 
   it('createOrUpdateAccount function exists and acts as required', function() {
     sinon.spy(scope, 'createOrUpdateAccount');
+    expect(scope.createOrUpdateAccount).to.be.a('function');
 
     scope.createOrUpdateAccount();
-    expect(scope.createOrUpdateAccount).to.be.a('function');
 
     assert(scope.createOrUpdateAccount.calledOnce);
     assert(userResource.update.calledOnce);

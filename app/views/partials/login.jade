@@ -1,3 +1,7 @@
+md-toolbar.md-warn(ng-show="response.error")
+  .md-toolbar-tools
+    h2.md-flex {{ response.error }}
+
 md-card.border-round(flex layout-padding)
   form(name="login" ng-submit="loginUser()" novalidate)
     .container(md-block flex layout="row")

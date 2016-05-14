@@ -58,8 +58,7 @@ Users.prototype = {
               });
           } else {
             err = new Error('The username specified does not exist. Create one?');
-            err.status = 404;
-            return next(err);
+            next(err);
           }
         });
     } else {
@@ -94,16 +93,16 @@ Users.prototype = {
       });
     });
   },
-  session: function(req, res, next) {
-    // req.decoded.token = req.headers['x-access-token'];
+  session: function(req, res) {
     if (req.session.hasOwnProperty('user')) {
-      return res.json({
+      return res.status(200).json({
         user: req.session.user,
         message: 'You are logged in as ' + req.session.user.username
       });
     } else {
-      var err = new Error('No user is logged in.');
-      return next(err);
+      res.status(404).json({
+        error: 'No user is logged in.'
+      });
     }
   },
   all: function(req, res, next) {

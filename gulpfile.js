@@ -1,5 +1,4 @@
-// load the applications environment
-require('dotenv').load();
+require('./environment');
 
 var gulp = require('gulp'),
   plumber = require('gulp-plumber'),
@@ -78,18 +77,6 @@ gulp.task('test:bend', function() {
     });
 });
 
-gulp.task('e2e', function(done) {
-  var args = ['--baseUrl', 'http://127.0.0.1:3000'];
-  gulp.src(['./tests/e2e/*.js'])
-    .pipe(protractor({
-      configFile: 'protractor.conf.js',
-      args: args
-    }))
-    .on('error', function(e) {
-      throw e;
-    });
-});
-
 gulp.task('bower', function() {
   return bower()
     .pipe(gulp.dest('public/vendor/'));
@@ -138,21 +125,21 @@ gulp.task('less', function() {
         this.emit('end');
       }
     }))
-    .pipe(sourcemaps.init())
     .pipe(less())
     .pipe(autoprefixer('last 2 versions'))
     .pipe(gulp.dest('public/css/'))
     .pipe(rename({
       suffix: '.min'
     }))
+    .pipe(sourcemaps.init())
     .pipe(minifycss())
     .pipe(cachebust.resources())
-    .pipe(sourcemaps.write('./maps'))
-    .pipe(rename('application.css'))
+    .pipe(rename('application.min.css'))
     .pipe(gulp.dest('public/css/'))
+    .pipe(sourcemaps.write('./maps'))
     .pipe(browserSync.reload({
       stream: true
-    }))
+    }));
 });
 
 gulp.task('lint', function() {
@@ -173,12 +160,12 @@ gulp.task('browserify', function() {
     entries: './app/scripts/application.js',
     debug: true,
     paths: [
-      './app/scripts/controllers',
-      './app/scripts/decorators',
-      './app/scripts/services',
-      './app/scripts/directives',
-      './app/scripts/filters',
-      './app/scripts/routes',
+      './app/scripts/controllers/*.js',
+      './app/scripts/decorators/*.js',
+      './app/scripts/services/*.js',
+      './app/scripts/directives/*.js',
+      './app/scripts/filters/*.js',
+      './app/scripts/routes/*.js',
       './app/scripts/*.js'
     ],
     transform: [ngAnnotate]
@@ -188,23 +175,23 @@ gulp.task('browserify', function() {
     .pipe(source('application.js'))
     .pipe(buffer())
     .pipe(cachebust.resources())
+    .pipe(uglify())
+    .on('error', gutil.log)
+    // vinyl-source-stream makes the bundle compatible with gulp
+    .pipe(rename('application.js'))
     .pipe(sourcemaps.init({
       loadMaps: true
     }))
-    // .pipe(uglify())
-    .on('error', gutil.log)
     .pipe(sourcemaps.write('./maps'))
-    // vinyl-source-stream makes the bundle compatible with gulp
-    .pipe(rename('application.js'))
     .pipe(gulp.dest('./public/js/'));
 });
 
 gulp.task('browser-sync', function() {
   browserSync.init(null, {
-    proxy: 'http://localhost:3333',
+    proxy: 'http://localhost:3000',
     files: ['public/**/*.*'],
     browser: 'google chrome',
-    port: 3000,
+    port: 3550,
   });
 });
 
@@ -225,14 +212,6 @@ gulp.task('nodemon', function() {
     .on('restart', function() {
       console.log('-->> application restart!');
     })
-    .on('start', function(cb) {
-      // to avoid nodemon being started multiple times
-      // thanks @matthisk
-      if (!started) {
-        cb();
-        started = true;
-      }
-    });
 });
 
 gulp.task('watch', function() {
@@ -242,22 +221,15 @@ gulp.task('watch', function() {
   gulp.watch(['./gulpfile.js'], ['build', 'watch'], browserSync.reload);
 });
 
-// Default configs
-gulp.task('build', ['clean', 'jade', 'less', 'static-files', 'images', 'browserify'], browserSync.reload);
-gulp.task('default', ['build', 'nodemon', 'watch']);
-gulp.task('production', ['build', 'nodemon']);
-
 // Helpers
 gulp.task('clean', ['clean-scripts', 'clean-styles']);
-gulp.task('sync', ['default', 'browser-sync']);
-
-// For continuous intergration tools
-gulp.task('ci', ['nodemon', 'browser-sync']);
-
+// Default configs
+gulp.task('build', ['jade', 'less', 'static-files', 'images', 'browserify', 'bower']);
+gulp.task('sync', ['clean', 'default', 'browser-sync']);
 // For heroku
-gulp.task('heroku:production', ['bower', 'build']);
-gulp.task('heroku:staging', ['bower', 'build']);
-
+gulp.task('heroku:production', ['build']);
+gulp.task('heroku:staging', ['build']);
+gulp.task('default', ['nodemon', 'watch', 'build']);
+gulp.task('production', ['nodemon', 'build']);
 // Tests
-gulp.task('bb', ['bower', 'browserify']);
-gulp.task('test', ['test:fend', 'test:bend' /*, 'e2e' */ , 'cover']);
+gulp.task('test', ['test:fend', 'test:bend' /*, 'e2e' */ ]);

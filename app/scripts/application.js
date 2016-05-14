@@ -12,7 +12,7 @@
 
   // Configurations
   app.config(['$httpProvider', '$mdThemingProvider', function($httpProvider, $mdThemingProvider) {
-    $httpProvider.defaults.headers.common.Accept = 'application/json';
+    $httpProvider.defaults.headers.common.Accept = 'application/json; charset=utf-8';
 
     $mdThemingProvider.theme('default')
       .primaryPalette('purple')

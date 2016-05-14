@@ -1,5 +1,4 @@
-// load the applications environment
-require('dotenv').load();
+require('../environment');
 
 var faker = require('faker'),
   mongoose = require('../server/config/database'),
@@ -8,6 +7,9 @@ var faker = require('faker'),
   Documents = require('../server/models/documents')(mongoose, Schema),
   exit = require('./exit'),
   documentstoCreate = 20;
+
+// # Bug fix: Schema hasn't been registered for model "Roles".
+require('../server/models/roles')(mongoose, Schema);
 
 function createDocument(user, newDocDetails, loopNo) {
   var newDoc = new Documents(newDocDetails);
