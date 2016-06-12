@@ -13,7 +13,7 @@ module.exports = function(config) {
     autoWatch: false,
 
 
-    // your prefered testing framework, be sure to install the karma plugin
+    // your preferred testing framework, be sure to install the karma plugin
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['mocha', 'sinon-chai' /*, 'chai', 'browserify' ,*/ ],
 

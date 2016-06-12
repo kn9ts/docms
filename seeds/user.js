@@ -29,7 +29,7 @@ Users.findOne()
     username: userDetails.username
   }])
   .exec(function(err, user) {
-    // an error occured
+    // an error occurred
     if (err) {
       console.error(err);
     }
