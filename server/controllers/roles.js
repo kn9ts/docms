@@ -60,7 +60,7 @@ Roles.prototype = {
           return next(err);
         }
 
-        // if no role was found but an error occured
+        // if no role was found but an error occurred
         if (err && !roleFound) {
           return next(err);
         }
@@ -70,7 +70,7 @@ Roles.prototype = {
         // save the document
         newRole.save(function(err) {
           if (err) {
-            err = new Error('Oops! An error occured. Role not created.');
+            err = new Error('Oops! An error occurred. Role not created.');
             err.status = 403;
             return next(err);
           }
@@ -115,7 +115,7 @@ Roles.prototype = {
             })
             .exec(function(err, user) {
               if (err) {
-                err = new Error('An error occured. Did not update your role.');
+                err = new Error('An error occurred. Did not update your role.');
                 return next(err);
               }
               if (user) {

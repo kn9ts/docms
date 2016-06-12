@@ -148,7 +148,7 @@ Users.prototype = {
           username: req.body.username
         }])
         .exec(function(err, user) {
-          // an error occured
+          // an error occurred
           if (err) {
             return next(err);
           }

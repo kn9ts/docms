@@ -69,7 +69,7 @@ describe('dashboardController', function() {
     assert(scope.deleteDocument.calledOnce);
   });
 
-  it('Search event is recieved and search method is called', inject(function($rootScope) {
+  it('Search event is received and search method is called', inject(function($rootScope) {
     $rootScope.$broadcast('seach_param_submitted', 'search_term');
     assert(docResource.search.calledOnce);
     expect(scope.myDocuments).to.have.length.above(0);
